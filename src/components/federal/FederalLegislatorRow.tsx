@@ -1,11 +1,11 @@
-import type { TableRow } from "@/services/api";
+import type { VisTable } from "@/services/api.types";
 import { ExpectationIcon } from "../ExpectationIcon";
 import { getExpectation, getExpectationColor } from "@/lib/expectations";
 import { ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface FederalLegislatorRowProps {
-  legislator: TableRow;
+  legislator: VisTable;
   selectedIssue?: string;
   onClick: () => void;
 }

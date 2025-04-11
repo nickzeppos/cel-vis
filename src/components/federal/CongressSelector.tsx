@@ -1,7 +1,7 @@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { getCongressDisplayName } from "@/lib/congress";
 import { getChamberDisplayName } from "@/lib/display";
-import type { ValidCongress } from "@/services/api";
+import type { ValidCongress } from "@/services/api.types";
 
 interface CongressSelectorProps {
   validCongresses: ValidCongress[];

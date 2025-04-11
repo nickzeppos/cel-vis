@@ -1,44 +1,46 @@
-import { useState, useEffect } from 'react';
-import { StateLegislatorRow } from './StateLegislatorRow';
-import { ColumnHeader } from '../ColumnHeader';
-import { cn } from '@/lib/utils';
-import { getStateTableData, type StateTableRow } from '@/services/api';
-import { getPartyOrder } from '@/lib/parties';
+import { useState, useEffect } from "react";
+import { StateLegislatorRow } from "./StateLegislatorRow";
+import { ColumnHeader } from "../ColumnHeader";
+import { getStateTableData } from "@/services/api";
+import { StateVisTable } from "@/services/api.types";
+import { getFederalPartyOrder, getStatePartyOrder } from "@/lib/parties";
+import { SortDirection, SortField } from "@/lib/types";
 
-type SortField = 'name' | 'rank' | 'score';
-type SortDirection = 'asc' | 'desc';
-
-interface StateViewProps {
+interface StateTableViewProps {
   selectedState: string;
   selectedTerm: string;
-  chamber: 'upper' | 'lower';
+  chamber: "upper" | "lower";
   searchTerm?: string;
-  onLegislatorSelect: (legislator: StateTableRow, term: string) => void;
+  onLegislatorSelect: (legislator: StateVisTable, term: string) => void;
 }
 
-export function StateView({ 
-  selectedState, 
-  selectedTerm, 
+export function StateTableView({
+  selectedState,
+  selectedTerm,
   chamber,
-  searchTerm = '',
-  onLegislatorSelect
-}: StateViewProps) {
-  const [sortField, setSortField] = useState<SortField>('score');
-  const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
-  const [legislatorsData, setLegislatorsData] = useState<StateTableRow[]>([]);
+  searchTerm = "",
+  onLegislatorSelect,
+}: StateTableViewProps) {
+  const [sortField, setSortField] = useState<SortField>("score");
+  const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
+  const [legislatorsData, setLegislatorsData] = useState<StateVisTable[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
-      if (!selectedState) return;
+      if (!selectedState || !selectedTerm) return;
 
       setIsLoading(true);
       setError(null);
       try {
-        const [startYear, endYear] = selectedTerm.split('-').map(Number);
-        const response = await getStateTableData(selectedState, startYear, endYear);
-        setLegislatorsData(response.data.filter(l => l.chamber === chamber));
+        const [startYear, endYear] = selectedTerm.split("-").map(Number);
+        const response = await getStateTableData(
+          selectedState,
+          startYear,
+          endYear
+        );
+        setLegislatorsData(response.data.filter((l) => l.chamber === chamber));
       } catch (err) {
         setError("Failed to load legislator data");
         console.error(err);
@@ -52,26 +54,26 @@ export function StateView({
 
   const handleSort = (field: SortField) => {
     if (sortField === field) {
-      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
     } else {
       setSortField(field);
-      setSortDirection('desc');
+      setSortDirection("desc");
     }
   };
 
   const filteredLegislators = legislatorsData
-    .filter(legislator => {
+    .filter((legislator) => {
       if (!searchTerm) return true;
       return legislator.name.toLowerCase().includes(searchTerm.toLowerCase());
     })
     .sort((a, b) => {
-      const direction = sortDirection === 'asc' ? 1 : -1;
+      const direction = sortDirection === "asc" ? 1 : -1;
       switch (sortField) {
-        case 'name':
+        case "name":
           return direction * a.name.localeCompare(b.name);
-        case 'rank':
-          return direction * (a.rank - b.rank);
-        case 'score':
+        case "rank":
+          return direction * (a.partyRank - b.partyRank);
+        case "score":
           return direction * (a.sles - b.sles);
         default:
           return 0;
@@ -79,32 +81,39 @@ export function StateView({
     });
 
   // Only group by party when sorting by score
-  const shouldGroupByParty = sortField === 'score';
-  
+  const shouldGroupByParty = sortField === "score";
+
   let displayLegislators;
   if (shouldGroupByParty) {
     // Get party order for current congress and chamber
-    const partyOrderForCongress = getPartyOrder(parseInt(selectedTerm.split('-')[0]), chamber === 'upper' ? 'senate' : 'house');
+    const partyOrderForCongress = getStatePartyOrder(legislatorsData, chamber);
 
     // Group legislators by party
-    const groupedLegislators = filteredLegislators.reduce((groups, legislator) => {
-      const party = legislator.party;
-      if (!groups[party]) {
-        groups[party] = [];
-      }
-      groups[party].push(legislator);
-      return groups;
-    }, {} as Record<string, typeof filteredLegislators>);
+    const groupedLegislators = filteredLegislators.reduce(
+      (groups, legislator) => {
+        const party = legislator.party;
+        if (!groups[party]) {
+          groups[party] = [];
+        }
+        groups[party].push(legislator);
+        return groups;
+      },
+      {} as Record<string, typeof filteredLegislators>
+    );
 
     // Sort parties according to congress-specific order
     displayLegislators = (
       <>
         {partyOrderForCongress
-          .filter(party => groupedLegislators[party]?.length > 0)
+          .filter((party) => groupedLegislators[party]?.length > 0)
           .map((party) => (
             <div key={party} className="border-b last:border-b-0">
               <div className="py-2 px-4 font-bold bg-muted">
-                {party === 'D' ? 'Democrat' : party === 'R' ? 'Republican' : 'Independent'}
+                {party === "D"
+                  ? "Democrat"
+                  : party === "R"
+                  ? "Republican"
+                  : "Independent"}
               </div>
               {groupedLegislators[party].map((legislator) => (
                 <StateLegislatorRow
@@ -134,16 +143,12 @@ export function StateView({
 
   // Show loading state
   if (isLoading) {
-    return (
-      <div className="text-xl">Loading legislator data...</div>
-    );
+    return <div className="text-xl">Loading legislator data...</div>;
   }
 
   // Show error state
   if (error) {
-    return (
-      <div className="text-xl text-red-500">{error}</div>
-    );
+    return <div className="text-xl text-red-500">{error}</div>;
   }
 
   return (
@@ -152,6 +157,7 @@ export function StateView({
         <div className="flex border-b">
           <div className="w-[400px] p-4">
             <ColumnHeader
+              type="state"
               label="Name"
               sortField="name"
               currentSort={sortField}
@@ -161,6 +167,7 @@ export function StateView({
           </div>
           <div className="w-[140px] p-4">
             <ColumnHeader
+              type="state"
               label="Party Rank"
               sortField="rank"
               currentSort={sortField}
@@ -173,6 +180,7 @@ export function StateView({
           </div>
           <div className="w-[120px] p-4">
             <ColumnHeader
+              type="state"
               label="SLES"
               sortField="score"
               currentSort={sortField}

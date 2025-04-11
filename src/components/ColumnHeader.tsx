@@ -1,14 +1,16 @@
 import { ArrowDownIcon, ArrowUpIcon, ArrowUpDownIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { SortField } from "@/lib/types";
 
 interface ColumnHeaderProps {
   label: string;
-  sortField: string;
-  currentSort: string;
+  sortField: SortField;
+  currentSort: SortField;
   direction: 'asc' | 'desc';
-  onSort: (field: any) => void;
-  disabled?: boolean;
+  onSort: (field: SortField) => void;
+  type: 'federal' | 'state';
   className?: string;
+  disableSort?: boolean;
 }
 
 export function ColumnHeader({
@@ -17,10 +19,12 @@ export function ColumnHeader({
   currentSort,
   direction,
   onSort,
-  disabled = false,
+  type,
   className,
+  disableSort = false,
 }: ColumnHeaderProps) {
   const isActive = currentSort === sortField;
+  const isSortable = !disableSort;
 
   return (
     <button
@@ -30,24 +34,26 @@ export function ColumnHeader({
         "hover:text-gray-900 transition-colors",
         "focus:outline-none focus-visible:outline-none",
         isActive ? "text-gray-900" : "text-gray-600",
-        disabled && "cursor-not-allowed opacity-50",
+        !isSortable && "cursor-not-allowed opacity-50",
         className
       )}
-      onClick={() => !disabled && onSort(sortField)}
-      disabled={disabled}
+      onClick={() => isSortable && onSort(sortField)}
+      disabled={!isSortable}
     >
       <span className="whitespace-nowrap">{label}</span>
-      <div className="flex-shrink-0">
-        {isActive ? (
-          direction === 'asc' ? (
-            <ArrowUpIcon className="h-4 w-4" />
+      {isSortable && (
+        <div className="flex-shrink-0">
+          {isActive ? (
+            direction === 'asc' ? (
+              <ArrowUpIcon className="h-4 w-4" />
+            ) : (
+              <ArrowDownIcon className="h-4 w-4" />
+            )
           ) : (
-            <ArrowDownIcon className="h-4 w-4" />
-          )
-        ) : (
-          <ArrowUpDownIcon className="h-4 w-4 opacity-50" />
-        )}
-      </div>
+            <ArrowUpDownIcon className="h-4 w-4 opacity-50" />
+          )}
+        </div>
+      )}
     </button>
   );
 }

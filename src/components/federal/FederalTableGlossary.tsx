@@ -1,5 +1,5 @@
 import { Card, CardContent } from "@/components/ui/card";
-import { ExpectationIcon } from "./ExpectationIcon";
+import { ExpectationIcon } from "../ExpectationIcon";
 import { Expectation } from "@/lib/expectations";
 import { colors } from "@/lib/colors";
 
@@ -18,7 +18,7 @@ const terms = [
   ],
 ] as const;
 
-export function TableGlossary() {
+export function FederalTableGlossary() {
   return (
     <Card className="mt-4">
       <CardContent className="p-6 space-y-4 text-sm">

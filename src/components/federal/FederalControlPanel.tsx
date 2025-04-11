@@ -1,50 +1,35 @@
-import React from 'react';
+import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Separator } from "@/components/ui/separator";
-import { StateMap, states } from "@/components/StateMap";
-import { TableGlossary } from "../TableGlossary";
+import { states } from "@/components/Map";
+import { FederalTableGlossary } from "./FederalTableGlossary";
 import { useCongressList } from "@/hooks/useCongressList";
 import { getCongressDisplayName } from "@/lib/congress";
 import { getIssueDisplayName } from "@/lib/display";
-
-// Get the keys from issueDisplayNames and sort them
-const AVAILABLE_ISSUES = [
-  "agriculture",
-  "civilrights",
-  "commerce",
-  "defense",
-  "education",
-  "energy",
-  "environment",
-  "governmentops",
-  "health",
-  "immigration",
-  "internationalaffairs",
-  "labor",
-  "lawcrime",
-  "macro",
-  "nativeamericans",
-  "publiclands",
-  "technology",
-  "trade",
-  "transportation",
-  "welfare",
-  "housing",
-].sort();
+import { FederalMap } from "./FederalMap";
+import { FederalChamberSelector } from "@/components/ChamberSelector";
+import type { FederalChamber } from "@/lib/types";
+import { ToggleGroup, ToggleGroupItem } from "../ui/toggle-group";
 
 interface FederalControlPanelProps {
   congress: string;
-  chamber: 'house' | 'senate';
+  chamber: FederalChamber;
   selectedState: string;
   onCongressChange: (value: string) => void;
-  onChamberChange: (value: 'house' | 'senate') => void;
+  onChamberChange: (value: FederalChamber) => void;
   onFilterChange: (value: string) => void;
   onSearchChange: (value: string) => void;
   selectedIssue?: string;
   onIssueChange?: (value: string) => void;
+  availableIssues?: string[];
 }
 
 export function FederalControlPanel({
@@ -55,26 +40,34 @@ export function FederalControlPanel({
   onChamberChange,
   onFilterChange,
   onSearchChange,
-  selectedIssue = 'all',
+  selectedIssue = "all",
   onIssueChange = () => {},
+  availableIssues = [],
 }: FederalControlPanelProps) {
-  const [filterMode, setFilterMode] = React.useState<'state' | 'search'>('state');
-  const [searchInputValue, setSearchInputValue] = React.useState('');
-  const { congressList, isLoading } = useCongressList();
+  const [filterMode, setFilterMode] = React.useState<"state" | "search">(
+    "state"
+  );
+  const [searchInputValue, setSearchInputValue] = React.useState("");
+  const { congressList = [], isLoading } = useCongressList();
+
+  // Sort available issues alphabetically by their display names
+  const sortedIssues = [...availableIssues].sort((a, b) =>
+    getIssueDisplayName(a).localeCompare(getIssueDisplayName(b))
+  );
 
   // Handle filter mode change
   const handleFilterModeChange = (value: string) => {
     if (value) {
-      const newMode = value as 'state' | 'search';
+      const newMode = value as "state" | "search";
       setFilterMode(newMode);
-      
+
       // Reset relevant state when switching modes
-      if (newMode === 'state') {
-        setSearchInputValue('');
-        onSearchChange('');
+      if (newMode === "state") {
+        setSearchInputValue("");
+        onSearchChange("");
       } else {
         // When switching to search mode, reset state filter
-        onFilterChange('all');
+        onFilterChange("all");
       }
     }
   };
@@ -83,20 +76,20 @@ export function FederalControlPanel({
   const handleSearchChange = (value: string) => {
     setSearchInputValue(value);
     onSearchChange(value);
-    
+
     // Reset state filter on any search input change
-    if (selectedState !== 'all') {
-      onFilterChange('all');
+    if (selectedState !== "all") {
+      onFilterChange("all");
     }
   };
 
   // Handle state selection
   const handleStateSelect = (state: string) => {
     // If we're in search mode, switch back to state mode
-    if (filterMode === 'search') {
-      setFilterMode('state');
-      setSearchInputValue('');
-      onSearchChange('');
+    if (filterMode === "search") {
+      setFilterMode("state");
+      setSearchInputValue("");
+      onSearchChange("");
     }
     onFilterChange(state);
   };
@@ -108,15 +101,22 @@ export function FederalControlPanel({
           <div className="space-y-6">
             <div className="space-y-4">
               <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700">CONGRESS</label>
-                <Select 
-                  value={congress} 
+                <label className="text-sm font-medium text-gray-700">
+                  CONGRESS
+                </label>
+                <Select
+                  value={congress}
                   onValueChange={onCongressChange}
                   disabled={isLoading}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder={isLoading ? "Loading..." : "Select Congress"}>
-                      {congress && `${getCongressDisplayName(parseInt(congress))} Congress`}
+                    <SelectValue
+                      placeholder={isLoading ? "Loading..." : "Select Congress"}
+                    >
+                      {congress &&
+                        `${getCongressDisplayName(
+                          parseInt(congress)
+                        )} Congress`}
                     </SelectValue>
                   </SelectTrigger>
                   <SelectContent>
@@ -129,42 +129,26 @@ export function FederalControlPanel({
                 </Select>
               </div>
 
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700">CHAMBER</label>
-                <ToggleGroup
-                  type="single"
-                  value={chamber}
-                  onValueChange={(value) => value && onChamberChange(value as 'house' | 'senate')}
-                  className="justify-stretch"
-                >
-                  <ToggleGroupItem
-                    value="house"
-                    className="flex-1 bg-secondary text-secondary-foreground hover:bg-secondary/80 data-[state=on]:bg-accent data-[state=on]:text-accent-foreground data-[state=on]:hover:bg-accent/90"
-                    aria-label="House"
-                  >
-                    House
-                  </ToggleGroupItem>
-                  <ToggleGroupItem
-                    value="senate"
-                    className="flex-1 bg-secondary text-secondary-foreground hover:bg-secondary/80 data-[state=on]:bg-accent data-[state=on]:text-accent-foreground data-[state=on]:hover:bg-accent/90"
-                    aria-label="Senate"
-                  >
-                    Senate
-                  </ToggleGroupItem>
-                </ToggleGroup>
-              </div>
+              <FederalChamberSelector
+                selectedChamber={chamber}
+                onChamberChange={onChamberChange}
+              />
 
               <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700">ISSUE</label>
+                <label className="text-sm font-medium text-gray-700">
+                  ISSUE
+                </label>
                 <Select value={selectedIssue} onValueChange={onIssueChange}>
                   <SelectTrigger>
                     <SelectValue placeholder="Select issue">
-                      {selectedIssue === 'all' ? 'All Issues' : getIssueDisplayName(selectedIssue)}
+                      {selectedIssue === "all"
+                        ? "All Issues"
+                        : getIssueDisplayName(selectedIssue)}
                     </SelectValue>
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">All Issues</SelectItem>
-                    {AVAILABLE_ISSUES.map((issue) => (
+                    {sortedIssues.map((issue) => (
                       <SelectItem key={issue} value={issue}>
                         {getIssueDisplayName(issue)}
                       </SelectItem>
@@ -177,44 +161,50 @@ export function FederalControlPanel({
             <Separator className="bg-gray-200 h-[2px]" />
 
             <div className="space-y-4">
-              <ToggleGroup
-                type="single"
-                value={filterMode}
-                onValueChange={handleFilterModeChange}
-                className="justify-stretch"
-              >
-                <ToggleGroupItem
-                  value="state"
-                  className="flex-1 bg-secondary text-secondary-foreground hover:bg-secondary/80 data-[state=on]:bg-accent data-[state=on]:text-accent-foreground data-[state=on]:hover:bg-accent/90"
-                  aria-label="Filter by State"
-                >
-                  Filter by State
-                </ToggleGroupItem>
-                <ToggleGroupItem
-                  value="search"
-                  className="flex-1 bg-secondary text-secondary-foreground hover:bg-secondary/80 data-[state=on]:bg-accent data-[state=on]:text-accent-foreground data-[state=on]:hover:bg-accent/90"
-                  aria-label="Search"
-                >
-                  Search
-                </ToggleGroupItem>
-              </ToggleGroup>
-
               <div className="space-y-4">
+                <ToggleGroup
+                  type="single"
+                  value={filterMode}
+                  onValueChange={handleFilterModeChange}
+                  className="w-full justify-stretch"
+                >
+                  <ToggleGroupItem
+                    value="state"
+                    className="flex-1 bg-secondary text-secondary-foreground hover:bg-secondary/80 data-[state=on]:bg-accent data-[state=on]:text-accent-foreground data-[state=on]:hover:bg-accent/90"
+                    aria-label="Filter by State"
+                  >
+                    Filter by State
+                  </ToggleGroupItem>
+                  <ToggleGroupItem
+                    value="search"
+                    className="flex-1 bg-secondary text-secondary-foreground hover:bg-secondary/80 data-[state=on]:bg-accent data-[state=on]:text-accent-foreground data-[state=on]:hover:bg-accent/90"
+                    aria-label="Search by Name or Zip"
+                  >
+                    Search
+                  </ToggleGroupItem>
+                </ToggleGroup>
                 <div className="h-[40px]">
-                  {filterMode === 'state' ? (
-                    <Select value={selectedState} onValueChange={handleStateSelect}>
+                  {filterMode === "state" ? (
+                    <Select
+                      value={selectedState}
+                      onValueChange={handleStateSelect}
+                    >
                       <SelectTrigger>
                         <SelectValue placeholder="Select state">
-                          {selectedState === 'all' ? 'All States' : selectedState}
+                          {selectedState === "all"
+                            ? "All States"
+                            : selectedState}
                         </SelectValue>
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="all">All States</SelectItem>
-                        {Object.keys(states).sort().map((state) => (
-                          <SelectItem key={state} value={state}>
-                            {state}
-                          </SelectItem>
-                        ))}
+                        {Object.keys(states)
+                          .sort()
+                          .map((state) => (
+                            <SelectItem key={state} value={state}>
+                              {state}
+                            </SelectItem>
+                          ))}
                       </SelectContent>
                     </Select>
                   ) : (
@@ -227,10 +217,10 @@ export function FederalControlPanel({
                   )}
                 </div>
 
-                <StateMap
+                <FederalMap
                   selectedState={selectedState}
                   onStateSelect={handleStateSelect}
-                  isSearchMode={filterMode === 'search'}
+                  isSearchMode={filterMode === "search"}
                 />
               </div>
             </div>
@@ -238,7 +228,7 @@ export function FederalControlPanel({
         </CardContent>
       </Card>
 
-      <TableGlossary />
+      <FederalTableGlossary />
     </div>
   );
 }

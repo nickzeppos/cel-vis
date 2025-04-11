@@ -1,5 +1,10 @@
 import { cn } from "@/lib/utils";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface MapProps {
   selectedState: string;
@@ -8,7 +13,7 @@ interface MapProps {
 }
 
 export interface TileMap {
-  [state: string]: [number, number] // [col, row]
+  [state: string]: [number, number]; // [col, row]
 }
 
 export const states: TileMap = {
@@ -68,8 +73,9 @@ export const states: TileMap = {
 const maxRows = Math.max(...Object.values(states).map(([_, row]) => row)) + 1;
 const maxCols = Math.max(...Object.values(states).map(([col, _]) => col)) + 1;
 
-const stateGrid = Array.from({ length: maxRows }, () => 
-  Array.from({ length: maxCols }, () => null)
+const stateGrid: Array<Array<{ id: string } | null>> = Array.from(
+  { length: maxRows },
+  () => Array.from({ length: maxCols }, () => null)
 );
 
 // Fill the grid with states
@@ -80,12 +86,15 @@ Object.entries(states).forEach(([stateCode, [col, row]]) => {
 export function Map({ selectedState, onStateSelect, isAvailable }: MapProps) {
   return (
     <div className="w-full flex justify-center">
-      <div className="inline-grid gap-0.5" style={{
-        gridTemplateColumns: `repeat(${maxCols}, 20px)`,
-        gridTemplateRows: `repeat(${maxRows}, 20px)`
-      }}>
-        {stateGrid.map((row, rowIndex) => (
-          row.map((state, colIndex) => (
+      <div
+        className="inline-grid gap-0.5"
+        style={{
+          gridTemplateColumns: `repeat(${maxCols}, 20px)`,
+          gridTemplateRows: `repeat(${maxRows}, 20px)`,
+        }}
+      >
+        {stateGrid.map((row, rowIndex) =>
+          row.map((state, colIndex) =>
             state ? (
               <TooltipProvider key={`${rowIndex}-${colIndex}`}>
                 <Tooltip>
@@ -93,7 +102,9 @@ export function Map({ selectedState, onStateSelect, isAvailable }: MapProps) {
                     <button
                       onClick={() => {
                         if (!isAvailable || isAvailable(state.id)) {
-                          onStateSelect(state.id === selectedState ? 'all' : state.id);
+                          onStateSelect(
+                            state.id === selectedState ? "all" : state.id
+                          );
                         }
                       }}
                       className={cn(
@@ -104,17 +115,17 @@ export function Map({ selectedState, onStateSelect, isAvailable }: MapProps) {
                         selectedState === state.id
                           ? "bg-accent text-accent-foreground hover:bg-accent/90"
                           : isAvailable
-                            ? isAvailable(state.id)
-                              ? "bg-gray-100 text-gray-600 hover:bg-accent/20 hover:text-gray-800"
-                              : [
-                                  "bg-gray-100/25 text-gray-400/25 cursor-not-allowed",
-                                  "hover:bg-gray-100/25 hover:text-gray-400/25"
-                                ]
-                            : "bg-gray-100 text-gray-600 hover:bg-accent/20 hover:text-gray-800"
+                          ? isAvailable(state.id)
+                            ? "bg-gray-100 text-gray-600 hover:bg-accent/20 hover:text-gray-800"
+                            : [
+                                "bg-gray-100/25 text-gray-400/25 cursor-not-allowed",
+                                "hover:bg-gray-100/25 hover:text-gray-400/25",
+                              ]
+                          : "bg-gray-100 text-gray-600 hover:bg-accent/20 hover:text-gray-800"
                       )}
                       style={{
                         gridRow: rowIndex + 1,
-                        gridColumn: colIndex + 1
+                        gridColumn: colIndex + 1,
                       }}
                       disabled={isAvailable && !isAvailable(state.id)}
                     >
@@ -123,7 +134,7 @@ export function Map({ selectedState, onStateSelect, isAvailable }: MapProps) {
                   </TooltipTrigger>
                   {isAvailable && !isAvailable(state.id) && (
                     <TooltipContent>
-                      <p>Scores coming soon!</p>
+                      <p>{state.id} Scores coming soon!</p>
                     </TooltipContent>
                   )}
                 </Tooltip>
@@ -134,12 +145,12 @@ export function Map({ selectedState, onStateSelect, isAvailable }: MapProps) {
                 className="w-5 h-5"
                 style={{
                   gridRow: rowIndex + 1,
-                  gridColumn: colIndex + 1
+                  gridColumn: colIndex + 1,
                 }}
               />
             )
-          ))
-        ))}
+          )
+        )}
       </div>
     </div>
   );

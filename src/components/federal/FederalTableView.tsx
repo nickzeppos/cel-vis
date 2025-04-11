@@ -1,43 +1,45 @@
-import { useState, useEffect } from 'react';
-import { FederalLegislatorRow } from './FederalLegislatorRow';
-import { ColumnHeader } from '../ColumnHeader';
-import { cn } from '@/lib/utils';
-import { getPartyOrder } from '@/lib/parties';
-import { getTableData, getDistrictForZip, type TableRow, type CongressionalDistrict } from '@/services/api';
+import { useState, useEffect } from "react";
+import { FederalLegislatorRow } from "./FederalLegislatorRow";
+import { ColumnHeader } from "../ColumnHeader";
+import { cn } from "@/lib/utils";
+import { getFederalPartyOrder } from "@/lib/parties";
+import type { FederalChamber } from "@/lib/types";
+import type { VisTable, CongressionalDistrict } from "@/services/api.types";
+import { getTableData, getDistrictForZip } from "@/services/api";
 
-type SortField = 'name' | 'rank' | 'score';
-type SortDirection = 'asc' | 'desc';
-type Chamber = 'house' | 'senate';
+type SortField = "name" | "rank" | "score";
+type SortDirection = "asc" | "desc";
 
 const partyNames: Record<string, string> = {
-  D: 'Democrat',
-  R: 'Republican',
-  I: 'Independent'
+  D: "Democrat",
+  R: "Republican",
+  I: "Independent",
 };
 
-interface FederalViewProps {
+interface FederalTableViewProps {
   congress: string;
-  chamber: Chamber;
+  chamber: FederalChamber;
   stateFilter: string;
   searchTerm: string;
   selectedIssue: string;
-  onLegislatorSelect: (legislator: TableRow) => void;
+  onLegislatorSelect: (legislator: VisTable) => void;
 }
 
-export function FederalView({ 
-  congress, 
-  chamber, 
-  stateFilter, 
+export function FederalTableView({
+  congress,
+  chamber,
+  stateFilter,
   searchTerm,
   selectedIssue,
-  onLegislatorSelect
-}: FederalViewProps) {
-  const [sortField, setSortField] = useState<SortField>('score');
-  const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
-  const [legislatorsData, setLegislatorsData] = useState<TableRow[]>([]);
+  onLegislatorSelect,
+}: FederalTableViewProps) {
+  const [sortField, setSortField] = useState<SortField>("score");
+  const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
+  const [legislatorsData, setLegislatorsData] = useState<Array<VisTable>>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [districtFromZip, setDistrictFromZip] = useState<CongressionalDistrict | null>(null);
+  const [districtFromZip, setDistrictFromZip] =
+    useState<CongressionalDistrict | null>(null);
 
   // Fetch data when component mounts or congress changes
   useEffect(() => {
@@ -73,7 +75,7 @@ export function FederalView({
           const district = await getDistrictForZip(searchTerm);
           setDistrictFromZip(district || null);
         } catch (err) {
-          console.error('Failed to look up ZIP code:', err);
+          console.error("Failed to look up ZIP code:", err);
           setDistrictFromZip(null);
         }
       } else {
@@ -85,27 +87,28 @@ export function FederalView({
   }, [searchTerm]);
 
   const handleSort = (field: SortField) => {
-    if (selectedIssue !== 'all' && field === 'rank') return;
+    if (selectedIssue !== "all" && field === "rank") return;
 
     if (sortField === field) {
-      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
     } else {
       setSortField(field);
-      setSortDirection('desc');
+      setSortDirection("desc");
     }
   };
 
   const filteredLegislators = legislatorsData
     .filter((legislator) => {
       // Filter by chamber
-      if (chamber === 'house' && legislator.chamber !== 'H') return false;
-      if (chamber === 'senate' && legislator.chamber !== 'S') return false;
+      if (chamber === "house" && legislator.chamber !== "H") return false;
+      if (chamber === "senate" && legislator.chamber !== "S") return false;
 
       // Filter by state
-      if (stateFilter !== 'all' && legislator.state !== stateFilter) return false;
+      if (stateFilter !== "all" && legislator.state !== stateFilter)
+        return false;
 
       // Handle ZIP code search for House members
-      if (districtFromZip && chamber === 'house') {
+      if (districtFromZip && chamber === "house") {
         return (
           legislator.state === districtFromZip.state &&
           legislator.district === districtFromZip.district
@@ -113,7 +116,7 @@ export function FederalView({
       }
 
       // Handle ZIP code search for Senate members
-      if (districtFromZip && chamber === 'senate') {
+      if (districtFromZip && chamber === "senate") {
         return legislator.state === districtFromZip.state;
       }
 
@@ -125,17 +128,23 @@ export function FederalView({
       return true;
     })
     .sort((a, b) => {
-      const direction = sortDirection === 'asc' ? 1 : -1;
+      const direction = sortDirection === "asc" ? 1 : -1;
       switch (sortField) {
-        case 'name':
+        case "name":
           return direction * a.name.localeCompare(b.name);
-        case 'rank': {
-          if (selectedIssue !== 'all') return 0;
+        case "rank": {
+          if (selectedIssue !== "all") return 0;
           return direction * (a.partyRank - b.partyRank);
         }
-        case 'score': {
-          let scoreA = selectedIssue === 'all' ? a.les : (a.iles[selectedIssue.toLowerCase().replace(/\s+/g, '')] ?? 0);
-          let scoreB = selectedIssue === 'all' ? b.les : (b.iles[selectedIssue.toLowerCase().replace(/\s+/g, '')] ?? 0);
+        case "score": {
+          let scoreA =
+            selectedIssue === "all"
+              ? a.les
+              : a.iles[selectedIssue.toLowerCase().replace(/\s+/g, "")] ?? 0;
+          let scoreB =
+            selectedIssue === "all"
+              ? b.les
+              : b.iles[selectedIssue.toLowerCase().replace(/\s+/g, "")] ?? 0;
           return direction * (scoreA - scoreB);
         }
         default:
@@ -144,28 +153,34 @@ export function FederalView({
     });
 
   // Only group by party when sorting by score
-  const shouldGroupByParty = sortField === 'score';
-  
+  const shouldGroupByParty = sortField === "score";
+
   let displayLegislators;
   if (shouldGroupByParty) {
     // Get party order for current congress and chamber
-    const partyOrderForCongress = getPartyOrder(parseInt(congress), chamber);
+    const partyOrderForCongress = getFederalPartyOrder(
+      parseInt(congress),
+      chamber
+    );
 
     // Group legislators by party
-    const groupedLegislators = filteredLegislators.reduce((groups, legislator) => {
-      const party = legislator.party;
-      if (!groups[party]) {
-        groups[party] = [];
-      }
-      groups[party].push(legislator);
-      return groups;
-    }, {} as Record<string, typeof filteredLegislators>);
+    const groupedLegislators = filteredLegislators.reduce(
+      (groups, legislator) => {
+        const party = legislator.party;
+        if (!groups[party]) {
+          groups[party] = [];
+        }
+        groups[party].push(legislator);
+        return groups;
+      },
+      {} as Record<string, typeof filteredLegislators>
+    );
 
     // Sort parties according to congress-specific order
     displayLegislators = (
       <>
         {partyOrderForCongress
-          .filter(party => groupedLegislators[party]?.length > 0)
+          .filter((party) => groupedLegislators[party]?.length > 0)
           .map((party) => (
             <div key={party} className="border-b last:border-b-0">
               <div className="py-2 px-4 font-bold bg-muted">
@@ -201,19 +216,13 @@ export function FederalView({
 
   // Show loading state
   if (isLoading) {
-    return (
-      <div className="text-xl">Loading legislator data...</div>
-    );
+    return <div className="text-xl">Loading legislator data...</div>;
   }
 
   // Show error state
   if (error) {
-    return (
-      <div className="text-xl text-red-500">{error}</div>
-    );
+    return <div className="text-xl text-red-500">{error}</div>;
   }
-
-  const isIssueSelected = selectedIssue !== 'all';
 
   return (
     <div className="flex-1 min-w-0 flex flex-col bg-card rounded-lg border">
@@ -221,6 +230,7 @@ export function FederalView({
         <div className="flex border-b">
           <div className="w-[400px] p-4">
             <ColumnHeader
+              type="federal"
               label="Name"
               sortField="name"
               currentSort={sortField}
@@ -230,27 +240,31 @@ export function FederalView({
           </div>
           <div className="w-[120px] p-4">
             <ColumnHeader
+              type="federal"
               label="Party Rank"
               sortField="rank"
               currentSort={sortField}
               direction={sortDirection}
               onSort={handleSort}
-              disabled={isIssueSelected}
+              disableSort={selectedIssue !== "all"}
               className={cn(
-                isIssueSelected && "opacity-50 cursor-not-allowed"
+                selectedIssue !== "all" && "opacity-50 cursor-not-allowed"
               )}
             />
           </div>
           <div className="w-[120px] p-4">
-            <div className={cn(
-              "font-medium",
-              isIssueSelected && "opacity-50"
-            )}>
+            <div
+              className={cn(
+                "font-medium",
+                selectedIssue !== "all" && "opacity-50"
+              )}
+            >
               Benchmark
             </div>
           </div>
           <div className="w-[120px] p-4">
             <ColumnHeader
+              type="federal"
               label="LES"
               sortField="score"
               currentSort={sortField}

@@ -1,13 +1,39 @@
-import type { ScoreComponentsResponse, TableResponse } from "@/services/api";
+import type {
+  VisTableResponse,
+  VisScorecardResponse,
+} from "@/services/api.types";
 
-export const table_data_118: TableResponse = {
+export const table_data_118: VisTableResponse = {
   congress: 118,
+  availableIssues: [
+    "agriculture",
+    "civilrights",
+    "commerce",
+    "defense",
+    "education",
+    "energy",
+    "environment",
+    "governmentops",
+    "health",
+    "housing",
+    "immigration",
+    "internationalaffairs",
+    "labor",
+    "lawcrime",
+    "macro",
+    "nativeamericans",
+    "publiclands",
+    "technology",
+    "trade",
+    "transportation",
+    "welfare",
+  ],
   data: [
     {
-      bioguide: 'S000033',
-      benchmark: 1.5208423,
-      chamber: 'S',
-      district: null,
+      congress: 118,
+      bioguide: "S000033",
+      chamber: "S",
+      benchmark: 1.009342,
       iles: {
         agriculture: 0.062385321,
         civilrights: 0,
@@ -29,19 +55,20 @@ export const table_data_118: TableResponse = {
         technology: 0,
         trade: 0,
         transportation: 0,
-        welfare: 47.486996
+        welfare: 47.486996,
       },
       les: 0.82431006,
-      name: 'Sanders, Bernard',
-      party: 'I',
+      name: "Sanders, Bernard",
+      party: "I",
       partyRank: 0,
       partyTotal: 0,
-      state: 'VT'
+      state: "VT",
     },
     {
-      bioguide: 'G000559',
-      benchmark: 0.55136937,
-      chamber: 'H',
+      congress: 118,
+      bioguide: "G000559",
+      chamber: "H",
+      benchmark: 1.223124451,
       district: 8,
       iles: {
         agriculture: 0.18241042,
@@ -64,16 +91,17 @@ export const table_data_118: TableResponse = {
         technology: 0,
         trade: 0,
         transportation: 2.6786249,
-        welfare: 1.8436214
+        welfare: 1.8436214,
       },
       les: 0.33922347,
-      name: 'Garamendi, John',
-      party: 'D',
+      name: "Garamendi, John",
+      party: "D",
       partyRank: 116,
       partyTotal: 220,
-      state: 'CA'
+      state: "CA",
     },
     {
+      congress: 118,
       bioguide: "K000393",
       benchmark: 0.85184938,
       chamber: "S",
@@ -109,6 +137,7 @@ export const table_data_118: TableResponse = {
       state: "LA",
     },
     {
+      congress: 118,
       bioguide: "D000633",
       benchmark: 1.1898144,
       chamber: "H",
@@ -144,6 +173,7 @@ export const table_data_118: TableResponse = {
       state: "CA",
     },
     {
+      congress: 118,
       bioguide: "B001265",
       benchmark: 0.34802261,
       chamber: "S",
@@ -177,6 +207,7 @@ export const table_data_118: TableResponse = {
       state: "AK",
     },
     {
+      congress: 118,
       bioguide: "P000619",
       benchmark: 1.020709,
       chamber: "H",
@@ -212,6 +243,7 @@ export const table_data_118: TableResponse = {
       state: "AK",
     },
     {
+      congress: 118,
       bioguide: "A000055",
       benchmark: 1.5106934,
       chamber: "H",
@@ -247,6 +279,7 @@ export const table_data_118: TableResponse = {
       state: "AL",
     },
     {
+      congress: 118,
       bioguide: "F000480",
       benchmark: 1.1898144,
       chamber: "H",
@@ -282,6 +315,7 @@ export const table_data_118: TableResponse = {
       state: "CA",
     },
     {
+      congress: 118,
       bioguide: "G000585",
       benchmark: 0.53452849,
       chamber: "H",
@@ -317,6 +351,7 @@ export const table_data_118: TableResponse = {
       state: "CA",
     },
     {
+      congress: 118,
       bioguide: "C000141",
       benchmark: 1.5208423,
       chamber: "S",
@@ -354,10 +389,34 @@ export const table_data_118: TableResponse = {
   ],
 };
 
-export const table_data_117: TableResponse = {
+export const table_data_117: VisTableResponse = {
   congress: 117,
+  availableIssues: [
+    "agriculture",
+    "civilrights",
+    "commerce",
+    "defense",
+    "education",
+    "energy",
+    "environment",
+    "governmentops",
+    "health",
+    "housing",
+    "immigration",
+    "internationalaffairs",
+    "labor",
+    "lawcrime",
+    "macro",
+    "nativeamericans",
+    "publiclands",
+    "technology",
+    "trade",
+    "transportation",
+    "welfare",
+  ],
   data: [
     {
+      congress: 117,
       bioguide: "K000393",
       benchmark: 0.76612,
       chamber: "S",
@@ -393,6 +452,7 @@ export const table_data_117: TableResponse = {
       state: "LA",
     },
     {
+      congress: 117,
       bioguide: "V000128",
       benchmark: 1.05238,
       chamber: "S",
@@ -428,6 +488,7 @@ export const table_data_117: TableResponse = {
       state: "MD",
     },
     {
+      congress: 117,
       bioguide: "G000559",
       benchmark: 1.472072,
       chamber: "H",
@@ -463,6 +524,7 @@ export const table_data_117: TableResponse = {
       state: "CA",
     },
     {
+      congress: 117,
       bioguide: "K000397",
       benchmark: 0.558459,
       chamber: "H",
@@ -500,7 +562,7 @@ export const table_data_117: TableResponse = {
   ],
 };
 
-export const G000559_118_scorecard: ScoreComponentsResponse = {
+export const G000559_118_scorecard: VisScorecardResponse = {
   congress: 118,
   bioguide: "G000559",
   data: {
@@ -893,7 +955,7 @@ export const G000559_118_scorecard: ScoreComponentsResponse = {
   },
 };
 
-export const G000559_117_scorecard: ScoreComponentsResponse = {
+export const G000559_117_scorecard: VisScorecardResponse = {
   congress: 117,
   bioguide: "G000559",
   data: {
@@ -912,7 +974,7 @@ export const G000559_117_scorecard: ScoreComponentsResponse = {
       ss_aic: 1,
       ss_abc: 2,
       ss_pass: 2,
-      ss_law: 0
+      ss_law: 0,
     },
     issues: {
       agriculture: {
@@ -930,7 +992,7 @@ export const G000559_117_scorecard: ScoreComponentsResponse = {
         ss_aic: 0,
         ss_abc: 0,
         ss_pass: 0,
-        ss_law: 0
+        ss_law: 0,
       },
       civilrights: {
         c_bill: 0,
@@ -947,7 +1009,7 @@ export const G000559_117_scorecard: ScoreComponentsResponse = {
         ss_aic: 0,
         ss_abc: 0,
         ss_pass: 0,
-        ss_law: 0
+        ss_law: 0,
       },
       commerce: {
         c_bill: 0,
@@ -964,7 +1026,7 @@ export const G000559_117_scorecard: ScoreComponentsResponse = {
         ss_aic: 0,
         ss_abc: 0,
         ss_pass: 0,
-        ss_law: 0
+        ss_law: 0,
       },
       defense: {
         c_bill: 0,
@@ -981,7 +1043,7 @@ export const G000559_117_scorecard: ScoreComponentsResponse = {
         ss_aic: 0,
         ss_abc: 0,
         ss_pass: 0,
-        ss_law: 0
+        ss_law: 0,
       },
       education: {
         c_bill: 0,
@@ -998,7 +1060,7 @@ export const G000559_117_scorecard: ScoreComponentsResponse = {
         ss_aic: 0,
         ss_abc: 0,
         ss_pass: 0,
-        ss_law: 0
+        ss_law: 0,
       },
       energy: {
         c_bill: 0,
@@ -1015,7 +1077,7 @@ export const G000559_117_scorecard: ScoreComponentsResponse = {
         ss_aic: 0,
         ss_abc: 0,
         ss_pass: 0,
-        ss_law: 0
+        ss_law: 0,
       },
       environment: {
         c_bill: 0,
@@ -1032,7 +1094,7 @@ export const G000559_117_scorecard: ScoreComponentsResponse = {
         ss_aic: 0,
         ss_abc: 0,
         ss_pass: 0,
-        ss_law: 0
+        ss_law: 0,
       },
       governmentops: {
         c_bill: 0,
@@ -1049,7 +1111,7 @@ export const G000559_117_scorecard: ScoreComponentsResponse = {
         ss_aic: 0,
         ss_abc: 0,
         ss_pass: 0,
-        ss_law: 0
+        ss_law: 0,
       },
       health: {
         c_bill: 0,
@@ -1066,7 +1128,7 @@ export const G000559_117_scorecard: ScoreComponentsResponse = {
         ss_aic: 0,
         ss_abc: 0,
         ss_pass: 0,
-        ss_law: 0
+        ss_law: 0,
       },
       housing: {
         c_bill: 0,
@@ -1083,7 +1145,7 @@ export const G000559_117_scorecard: ScoreComponentsResponse = {
         ss_aic: 0,
         ss_abc: 0,
         ss_pass: 0,
-        ss_law: 0
+        ss_law: 0,
       },
       immigration: {
         c_bill: 0,
@@ -1100,7 +1162,7 @@ export const G000559_117_scorecard: ScoreComponentsResponse = {
         ss_aic: 0,
         ss_abc: 0,
         ss_pass: 0,
-        ss_law: 0
+        ss_law: 0,
       },
       internationalaffairs: {
         c_bill: 0,
@@ -1117,7 +1179,7 @@ export const G000559_117_scorecard: ScoreComponentsResponse = {
         ss_aic: 1,
         ss_abc: 1,
         ss_pass: 1,
-        ss_law: 0
+        ss_law: 0,
       },
       labor: {
         c_bill: 0,
@@ -1134,7 +1196,7 @@ export const G000559_117_scorecard: ScoreComponentsResponse = {
         ss_aic: 0,
         ss_abc: 0,
         ss_pass: 0,
-        ss_law: 0
+        ss_law: 0,
       },
       lawcrime: {
         c_bill: 0,
@@ -1151,7 +1213,7 @@ export const G000559_117_scorecard: ScoreComponentsResponse = {
         ss_aic: 0,
         ss_abc: 0,
         ss_pass: 0,
-        ss_law: 0
+        ss_law: 0,
       },
       macro: {
         c_bill: 0,
@@ -1168,7 +1230,7 @@ export const G000559_117_scorecard: ScoreComponentsResponse = {
         ss_aic: 0,
         ss_abc: 0,
         ss_pass: 0,
-        ss_law: 0
+        ss_law: 0,
       },
       nativeamericans: {
         c_bill: 0,
@@ -1185,7 +1247,7 @@ export const G000559_117_scorecard: ScoreComponentsResponse = {
         ss_aic: 0,
         ss_abc: 0,
         ss_pass: 0,
-        ss_law: 0
+        ss_law: 0,
       },
       publiclands: {
         c_bill: 0,
@@ -1202,7 +1264,7 @@ export const G000559_117_scorecard: ScoreComponentsResponse = {
         ss_aic: 0,
         ss_abc: 0,
         ss_pass: 0,
-        ss_law: 0
+        ss_law: 0,
       },
       technology: {
         c_bill: 0,
@@ -1219,7 +1281,7 @@ export const G000559_117_scorecard: ScoreComponentsResponse = {
         ss_aic: 0,
         ss_abc: 0,
         ss_pass: 0,
-        ss_law: 0
+        ss_law: 0,
       },
       trade: {
         c_bill: 0,
@@ -1236,7 +1298,7 @@ export const G000559_117_scorecard: ScoreComponentsResponse = {
         ss_aic: 0,
         ss_abc: 0,
         ss_pass: 0,
-        ss_law: 0
+        ss_law: 0,
       },
       transportation: {
         c_bill: 0,
@@ -1253,7 +1315,7 @@ export const G000559_117_scorecard: ScoreComponentsResponse = {
         ss_aic: 0,
         ss_abc: 1,
         ss_pass: 1,
-        ss_law: 0
+        ss_law: 0,
       },
       welfare: {
         c_bill: 0,
@@ -1270,8 +1332,8 @@ export const G000559_117_scorecard: ScoreComponentsResponse = {
         ss_aic: 0,
         ss_abc: 0,
         ss_pass: 0,
-        ss_law: 0
-      }
+        ss_law: 0,
+      },
     },
     validCongresses: [
       [113, "H"],
@@ -1281,7 +1343,7 @@ export const G000559_117_scorecard: ScoreComponentsResponse = {
       [117, "H"],
       [112, "H"],
       [111, "H"],
-      [114, "H"]
-    ]
-  }
+      [114, "H"],
+    ],
+  },
 };

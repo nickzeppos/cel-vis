@@ -4,14 +4,14 @@ const terms = [
   ['c', 'Commemorative bills'],
   ['s', 'Substantive bills'],
   ['ss', 'Substantive and Significant bills'],
-  ['bill', 'Number of bills (H.R. or S.) this member sponsored'],
+  ['bill', 'Number of bills this member sponsored'],
   ['aic', 'Number of bills receiving "Action in Committee"'],
-  ['abc', 'Number of bills receiving "Action beyond Committeee"'],
+  ['abc', 'Number of bills receiving "Action beyond Committee"'],
   ['pass', 'Number of bills passing the chamber of origin'],
   ['law', 'Number of bills becoming law'],
 ] as const;
 
-export function ScorecardGlossary() {
+export function StateScorecardGlossary() {
   return (
     <Card className="shadow-none border-0">
       <CardContent className="p-6 space-y-1 text-sm">

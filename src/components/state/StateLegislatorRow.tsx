@@ -1,21 +1,21 @@
-import type { StateTableRow } from "@/services/api";
 import { ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ExpectationIcon } from "../ExpectationIcon";
 import { getExpectation, getExpectationColor } from "@/lib/expectations";
+import { StateVisTable } from "@/services/api.types";
 
 interface StateLegislatorRowProps {
-  legislator: StateTableRow;
+  legislator: StateVisTable;
   onClick: () => void;
 }
 
 export function StateLegislatorRow({ legislator, onClick }: StateLegislatorRowProps) {
   const locationText = `District ${legislator.district}`;
 
-  const partyBgColor = {
+  const statePartyBgColor = {
     'R': 'bg-red-100',
     'D': 'bg-blue-100',
-    'I': 'bg-gray-100'
+    '3rd': 'bg-gray-100'
   }[legislator.party];
 
   const expectation = getExpectation(legislator.sles, legislator.benchmark);
@@ -35,7 +35,7 @@ export function StateLegislatorRow({ legislator, onClick }: StateLegislatorRowPr
             <div className="text-sm text-muted-foreground flex gap-8 font-mono">
               <span className={cn(
                 "w-6 h-6 flex items-center justify-center rounded",
-                partyBgColor
+                statePartyBgColor
               )}>
                 {legislator.party}
               </span>
@@ -45,7 +45,7 @@ export function StateLegislatorRow({ legislator, onClick }: StateLegislatorRowPr
         </div>
         <div className="w-[140px] p-4 flex items-center font-mono">
           <span className="whitespace-nowrap">
-            {legislator.rank}/{legislator.total}
+            {legislator.partyRank}/{legislator.partyTotal}
           </span>
         </div>
         <div className="w-[120px] p-4 flex items-center font-mono">
