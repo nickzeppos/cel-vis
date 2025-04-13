@@ -3,7 +3,7 @@ import { StateLegislatorRow } from "./StateLegislatorRow";
 import { ColumnHeader } from "../ColumnHeader";
 import { getStateTableData } from "@/services/api";
 import { StateVisTable } from "@/services/api.types";
-import { getFederalPartyOrder, getStatePartyOrder } from "@/lib/parties";
+import { getStatePartyOrder } from "@/lib/parties";
 import { SortDirection, SortField } from "@/lib/types";
 
 interface StateTableViewProps {

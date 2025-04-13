@@ -6,9 +6,9 @@ interface ColumnHeaderProps {
   label: string;
   sortField: SortField;
   currentSort: SortField;
-  direction: 'asc' | 'desc';
+  direction: "asc" | "desc";
   onSort: (field: SortField) => void;
-  type: 'federal' | 'state';
+  type: "federal" | "state";
   className?: string;
   disableSort?: boolean;
 }
@@ -19,7 +19,7 @@ export function ColumnHeader({
   currentSort,
   direction,
   onSort,
-  type,
+  // type,
   className,
   disableSort = false,
 }: ColumnHeaderProps) {
@@ -44,7 +44,7 @@ export function ColumnHeader({
       {isSortable && (
         <div className="flex-shrink-0">
           {isActive ? (
-            direction === 'asc' ? (
+            direction === "asc" ? (
               <ArrowUpIcon className="h-4 w-4" />
             ) : (
               <ArrowDownIcon className="h-4 w-4" />

@@ -35,7 +35,7 @@ export function FederalScorecardView({
   const [scorecard, setScorecard] = useState<VisScorecardResponse | null>(
     initialScorecard
   );
-  const [isLoading, setIsLoading] = useState(false);
+  const [_, setIsLoading] = useState(false);
 
   useEffect(() => {
     if (matrixRef.current) {
