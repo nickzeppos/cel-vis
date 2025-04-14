@@ -20,6 +20,8 @@ import type {
   VisTableResponse,
 } from "@/services/api.types";
 import { toast } from "sonner";
+import { FederalTableGlossary } from "./components/federal/FederalTableGlossary";
+import { StateTableGlossary } from "./components/state/StateTableGlossary";
 
 function App() {
   const [level, setLevel] = useState<ViewLevel>("federal");
@@ -168,61 +170,69 @@ function App() {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-8 max-w-[1400px]">
-        <div className="flex gap-4">
-          <div className="w-80 flex-shrink-0 space-y-4">
-            <LevelToggle level={level} onLevelChange={handleLevelChange} />
+      <div className="relative flex flex-col items-center px-4 py-8">
+        <div className="w-full max-w-[1200px]">
+          <div className="grid gap-x-6 gap-y-4 grid-cols-1 grid-rows-[min-content_min-content_min-content] grid-areas-mobile md:grid-cols-[1fr_2fr] md:grid-rows-[min-content_1fr] md:grid-areas-desktop">
+            <div className="grid-in-a space-y-4">
+              <LevelToggle level={level} onLevelChange={handleLevelChange} />
 
-            {/* Control Panel */}
-            {level === "federal" ? (
-              <FederalControlPanel
-                congress={congress}
-                chamber={chamber}
-                selectedState={stateFilter}
-                selectedIssue={selectedIssue}
-                onCongressChange={handleCongressChange}
-                onChamberChange={setChamber}
-                onFilterChange={setStateFilter}
-                onSearchChange={setSearchTerm}
-                onIssueChange={setSelectedIssue}
-                availableIssues={tableData?.availableIssues}
-              />
-            ) : (
-              <StateControlPanel
-                selectedState={selectedState}
-                selectedTerm={selectedTerm}
-                selectedChamber={stateChamber}
-                onStateSelect={setSelectedState}
-                onTermChange={setSelectedTerm}
-                onChamberChange={setStateChamber}
-                onSearchChange={setStateSearchTerm}
-              />
-            )}
-          </div>
+              {/* Control Panel */}
+              {level === "federal" ? (
+                <FederalControlPanel
+                  congress={congress}
+                  chamber={chamber}
+                  selectedState={stateFilter}
+                  selectedIssue={selectedIssue}
+                  onCongressChange={handleCongressChange}
+                  onChamberChange={setChamber}
+                  onFilterChange={setStateFilter}
+                  onSearchChange={setSearchTerm}
+                  onIssueChange={setSelectedIssue}
+                  availableIssues={tableData?.availableIssues}
+                />
+              ) : (
+                <StateControlPanel
+                  selectedState={selectedState}
+                  selectedTerm={selectedTerm}
+                  selectedChamber={stateChamber}
+                  onStateSelect={setSelectedState}
+                  onTermChange={setSelectedTerm}
+                  onChamberChange={setStateChamber}
+                  onSearchChange={setStateSearchTerm}
+                />
+              )}
+            </div>
 
-          <div className="flex-1 min-w-0 space-y-4">
-            <h1 className="text-3xl font-bold">
-              Dynamic title area, work in progres
-            </h1>
+            <div className="grid-in-b space-y-4 min-h-[600px]">
+              <h1 className="text-3xl font-bold">DYNAMIC TITLE</h1>
 
-            {level === "federal" ? (
-              <FederalTableView
-                congress={congress}
-                chamber={chamber}
-                stateFilter={stateFilter}
-                searchTerm={searchTerm}
-                selectedIssue={selectedIssue}
-                onLegislatorSelect={handleFederalLegislatorSelect}
-              />
-            ) : (
-              <StateTableView
-                selectedState={selectedState}
-                selectedTerm={selectedTerm}
-                chamber={stateChamber}
-                searchTerm={stateSearchTerm}
-                onLegislatorSelect={handleStateLegislatorSelect}
-              />
-            )}
+              {level === "federal" ? (
+                <FederalTableView
+                  congress={congress}
+                  chamber={chamber}
+                  stateFilter={stateFilter}
+                  searchTerm={searchTerm}
+                  selectedIssue={selectedIssue}
+                  onLegislatorSelect={handleFederalLegislatorSelect}
+                />
+              ) : (
+                <StateTableView
+                  selectedState={selectedState}
+                  selectedTerm={selectedTerm}
+                  chamber={stateChamber}
+                  searchTerm={stateSearchTerm}
+                  onLegislatorSelect={handleStateLegislatorSelect}
+                />
+              )}
+            </div>
+
+            <div className="grid-in-c space-y-4">
+              {level === "federal" ? (
+                <FederalTableGlossary />
+              ) : (
+                <StateTableGlossary />
+              )}
+            </div>
           </div>
         </div>
       </div>

@@ -87,7 +87,7 @@ export function Map({ selectedState, onStateSelect, isAvailable }: MapProps) {
   return (
     <div className="w-full flex justify-center">
       <div
-        className="inline-grid gap-0.5"
+        className="grid gap-2"
         style={{
           gridTemplateColumns: `repeat(${maxCols}, 20px)`,
           gridTemplateRows: `repeat(${maxRows}, 20px)`,

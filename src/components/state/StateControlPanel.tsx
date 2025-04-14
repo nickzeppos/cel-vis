@@ -9,13 +9,12 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
+import { useTermList } from "@/hooks/useTermList";
 import { getTermValue } from "@/lib/display";
 import type { StateChamber } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import React, { useEffect } from "react";
 import { StateMap } from "./StateMap";
-import { StateTableGlossary } from "./StateTableGlossary";
-import { useTermList } from "@/hooks/useTermList";
 
 // States with available data
 const AVAILABLE_STATES = ["GA", "MT"] as const;
@@ -209,8 +208,6 @@ export function StateControlPanel({
           </div>
         </CardContent>
       </Card>
-
-      <StateTableGlossary />
     </div>
   );
 }

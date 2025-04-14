@@ -152,6 +152,10 @@ export function StateTableView({
   }
 
   return (
+    // if selected state is not null, show column headerse and table, else just show table
+    // if selected state is not null but no legislators found, show "No results found"
+    // if selected state is null, show "Select a state to view legislators"
+
     <div className="flex-1 min-w-0 flex flex-col bg-card rounded-lg border">
       <div className="sticky top-0 z-10 bg-card rounded-t-lg">
         <div className="flex border-b">

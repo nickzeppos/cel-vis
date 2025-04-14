@@ -1,5 +1,7 @@
-import React from "react";
+import { FederalChamberSelector } from "@/components/ChamberSelector";
+import { states } from "@/components/Map";
 import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -7,17 +9,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
-import { states } from "@/components/Map";
-import { FederalTableGlossary } from "./FederalTableGlossary";
 import { useCongressList } from "@/hooks/useCongressList";
 import { getCongressDisplayName } from "@/lib/congress";
 import { getIssueDisplayName } from "@/lib/display";
-import { FederalMap } from "./FederalMap";
-import { FederalChamberSelector } from "@/components/ChamberSelector";
 import type { FederalChamber } from "@/lib/types";
+import React from "react";
 import { ToggleGroup, ToggleGroupItem } from "../ui/toggle-group";
+import { FederalMap } from "./FederalMap";
 
 interface FederalControlPanelProps {
   congress: string;
@@ -101,9 +100,7 @@ export function FederalControlPanel({
           <div className="space-y-6">
             <div className="space-y-4">
               <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700">
-                  CONGRESS
-                </label>
+                <label className="font-medium text-gray-700">CONGRESS</label>
                 <Select
                   value={congress}
                   onValueChange={onCongressChange}
@@ -135,9 +132,7 @@ export function FederalControlPanel({
               />
 
               <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700">
-                  ISSUE
-                </label>
+                <label className="font-medium text-gray-700">ISSUE</label>
                 <Select value={selectedIssue} onValueChange={onIssueChange}>
                   <SelectTrigger>
                     <SelectValue placeholder="Select issue">
@@ -227,8 +222,6 @@ export function FederalControlPanel({
           </div>
         </CardContent>
       </Card>
-
-      <FederalTableGlossary />
     </div>
   );
 }

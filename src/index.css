@@ -29,7 +29,6 @@ a:hover {
 body {
   margin: 0;
   display: flex;
-  place-items: center;
   min-width: 320px;
   min-height: 100vh;
 }
@@ -144,4 +143,46 @@ button:focus-visible {
 
 ::-webkit-scrollbar-thumb:hover {
   background: hsl(0 0% 70%);
+}
+
+@layer utilities {
+  .grid-areas-mobile {
+    grid-template-areas:
+      "a"
+      "b"
+      "c";
+  }
+
+  .grid-areas-desktop {
+    grid-template-areas:
+      "a b"
+      "c b";
+  }
+
+  .grid-in-a {
+    grid-area: a;
+  }
+
+  .grid-in-b {
+    grid-area: b;
+  }
+
+  .grid-in-c {
+    grid-area: c;
+  }
+}
+
+@layer base {
+  #root {
+    /* Reset inherited WordPress typography that breaks rem math */
+    font-size: 16px;
+    font-family: Inter, system-ui, sans-serif;
+    line-height: 1.5;
+    box-sizing: border-box;
+  }
+
+  #root *, #root *::before, #root *::after {
+    box-sizing: inherit;
+  }
+
 }

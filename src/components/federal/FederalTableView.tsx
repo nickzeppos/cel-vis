@@ -225,7 +225,7 @@ export function FederalTableView({
   }
 
   return (
-    <div className="flex-1 min-w-0 flex flex-col bg-card rounded-lg border">
+    <div className="flex-1 flex flex-col bg-card rounded-lg border min-w-[780px] overflow-x-auto">
       <div className="sticky top-0 z-10 bg-card rounded-t-lg">
         <div className="flex border-b">
           <div className="w-[400px] p-4">
@@ -262,7 +262,7 @@ export function FederalTableView({
               Benchmark
             </div>
           </div>
-          <div className="w-[120px] p-4">
+          <div className="w-[140px] p-4">
             <ColumnHeader
               type="federal"
               label="LES"
