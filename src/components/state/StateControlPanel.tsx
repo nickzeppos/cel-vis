@@ -1,4 +1,4 @@
-import { StateChamberSelector } from "@/components/ChamberSelector";
+import { StateChamberSelector } from "./StateChamberSelector";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import {

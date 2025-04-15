@@ -1,4 +1,4 @@
-import { FederalChamberSelector } from "@/components/ChamberSelector";
+import { FederalChamberSelector } from "./FederalChamberSelector";
 import { states } from "@/components/Map";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";

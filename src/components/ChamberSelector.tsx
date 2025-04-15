@@ -1,69 +1,27 @@
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import { chamberLabels } from '@/lib/consts'
-import { FederalChamber, StateChamber } from "@/lib/types";
 
-
-
-// Federal Chamber Selector
-interface FederalChamberSelectorProps {
-  selectedChamber: FederalChamber;
-  onChamberChange: (chamber: FederalChamber) => void;
+interface GenericChamberSelectorProps<T extends string> {
+  selected: T;
+  onChange: (value: T) => void;
+  labels: Record<T, string>;
 }
 
-export function FederalChamberSelector({ 
-  selectedChamber,
-  onChamberChange 
-}: FederalChamberSelectorProps) {
-  const labels = chamberLabels.federal;
-  const values = Object.keys(labels) as FederalChamber[];
-
+export function GenericChamberSelector<T extends string>({
+  selected,
+  onChange,
+  labels,
+}: GenericChamberSelectorProps<T>) {
+  const values = Object.keys(labels) as T[];
   return (
     <div className="space-y-2">
       <label className="text-sm font-medium text-gray-700">CHAMBER</label>
       <ToggleGroup
         type="single"
-        value={selectedChamber}
-        onValueChange={(value) => value && onChamberChange(value as FederalChamber)}
+        value={selected}
+        onValueChange={(value) => value && onChange(value as T)}
         className="justify-stretch"
       >
-        {values.map(value => (
-          <ToggleGroupItem
-            key={value}
-            value={value}
-            className="flex-1 bg-secondary text-secondary-foreground hover:bg-secondary/80 data-[state=on]:bg-accent data-[state=on]:text-accent-foreground data-[state=on]:hover:bg-accent/90"
-            aria-label={labels[value]}
-          >
-            {labels[value]}
-          </ToggleGroupItem>
-        ))}
-      </ToggleGroup>
-    </div>
-  );
-}
-
-// State Chamber Selector
-interface StateChamberSelectorProps {
-  selectedChamber: StateChamber;
-  onChamberChange: (chamber: StateChamber) => void;
-}
-
-export function StateChamberSelector({ 
-  selectedChamber,
-  onChamberChange 
-}: StateChamberSelectorProps) {
-  const labels = chamberLabels.state;
-  const values = Object.keys(labels) as StateChamber[];
-
-  return (
-    <div className="space-y-2">
-      <label className="text-sm font-medium text-gray-700">CHAMBER</label>
-      <ToggleGroup
-        type="single"
-        value={selectedChamber}
-        onValueChange={(value) => value && onChamberChange(value as StateChamber)}
-        className="justify-stretch"
-      >
-        {values.map(value => (
+        {values.map((value) => (
           <ToggleGroupItem
             key={value}
             value={value}
