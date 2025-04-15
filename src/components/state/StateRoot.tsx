@@ -1,66 +1,29 @@
 import { StateControlPanel } from "@/components/state/StateControlPanel";
 import { StateScorecardView } from "@/components/state/StateScorecardView";
 import { StateTableView } from "@/components/state/StateTableView";
-import type { StateChamber, ViewLevel } from "@/lib/types";
-import { getStateScorecardData } from "@/services/api";
-import type {
-  StateVisScorecardResponse,
-  StateVisTable,
-} from "@/services/api.types";
-import { useState } from "react";
-import { toast } from "sonner";
-import { StateTableGlossary } from "./StateTableGlossary";
+import { useStateState } from "@/hooks/useStateState";
+import type { ViewLevel } from "@/lib/types";
 import { LevelToggle } from "../LevelToggle";
+import { StateTableGlossary } from "./StateTableGlossary";
 
 type StateRootProps = {
   level: ViewLevel;
   setLevel: (level: ViewLevel) => void;
 };
 function StateRoot({ level, setLevel }: StateRootProps) {
-  // State level state
-  const [selectedState, setSelectedState] = useState("");
-  const [selectedTerm, setSelectedTerm] = useState("");
-  const [stateChamber, setStateChamber] = useState<StateChamber>("lower");
-  const [stateSearchTerm, setStateSearchTerm] = useState("");
-  const [selectedStateLegislator, setSelectedStateLegislator] =
-    useState<StateVisTable | null>(null);
-  const [selectedStateScorecard, setSelectedStateScorecard] =
-    useState<StateVisScorecardResponse | null>(null);
-  const [selectedStateTerm, setSelectedStateTerm] = useState("");
+  const stateState = useStateState();
 
-  const handleStateLegislatorSelect = async (
-    legislator: StateVisTable,
-    term: string
-  ) => {
-    try {
-      const [startYear, endYear] = term.split("-").map(Number);
-      const scorecard = await getStateScorecardData(
-        legislator.slesId,
-        startYear,
-        endYear
-      );
-      setSelectedStateScorecard(scorecard);
-      setSelectedStateLegislator(legislator);
-      setSelectedStateTerm(term);
-    } catch (err) {
-      console.error("Failed to fetch state scorecard data:", err);
-      toast.error("Failed to load scorecard data");
-      setSelectedStateLegislator(legislator);
-    }
-  };
-
-  // Show state scorecard
-  if (selectedStateLegislator) {
+  if (stateState.selectedStateLegislator) {
     return (
       <div className="min-h-screen bg-background">
         <div className="container mx-auto px-4 py-8 max-w-[1400px]">
           <StateScorecardView
-            legislator={selectedStateLegislator}
-            scorecard={selectedStateScorecard}
-            initialTerm={selectedStateTerm}
+            legislator={stateState.selectedStateLegislator}
+            scorecard={stateState.selectedStateScorecard}
+            initialTerm={stateState.selectedStateTerm}
             onBack={() => {
-              setSelectedStateLegislator(null);
-              setSelectedStateScorecard(null);
+              stateState.setSelectedStateLegislator(null);
+              stateState.setSelectedStateScorecard(null);
             }}
           />
         </div>
@@ -76,23 +39,23 @@ function StateRoot({ level, setLevel }: StateRootProps) {
             <div className="grid-in-a space-y-4">
               <LevelToggle level={level} onLevelChange={setLevel} />
               <StateControlPanel
-                selectedState={selectedState}
-                selectedTerm={selectedTerm}
-                selectedChamber={stateChamber}
-                onStateSelect={setSelectedState}
-                onTermChange={setSelectedTerm}
-                onChamberChange={setStateChamber}
-                onSearchChange={setStateSearchTerm}
+                selectedState={stateState.selectedState}
+                selectedTerm={stateState.selectedTerm}
+                selectedChamber={stateState.stateChamber}
+                onStateSelect={stateState.setSelectedState}
+                onTermChange={stateState.setSelectedTerm}
+                onChamberChange={stateState.setStateChamber}
+                onSearchChange={stateState.setStateSearchTerm}
               />
             </div>
             <div className="grid-in-b space-y-4 min-h-[600px]">
               <h1 className="text-3xl font-bold">DYNAMIC TITLE</h1>
               <StateTableView
-                selectedState={selectedState}
-                selectedTerm={selectedTerm}
-                chamber={stateChamber}
-                searchTerm={stateSearchTerm}
-                onLegislatorSelect={handleStateLegislatorSelect}
+                selectedState={stateState.selectedState}
+                selectedTerm={stateState.selectedTerm}
+                chamber={stateState.stateChamber}
+                searchTerm={stateState.stateSearchTerm}
+                onLegislatorSelect={stateState.handleStateLegislatorSelect}
               />
             </div>
             <div className="grid-in-c space-y-4">
