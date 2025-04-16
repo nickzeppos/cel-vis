@@ -1,7 +1,6 @@
 import { FederalChamberSelector } from "./FederalChamberSelector";
-import { states } from "@/components/Map";
+import { states } from "@/components/shared/Map";
 import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -11,12 +10,12 @@ import {
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { useCongressList } from "@/hooks/useCongressList";
-import { getCongressDisplayName } from "@/lib/congress";
-import { getIssueDisplayName } from "@/lib/display";
+import { getIssueDisplayName, getCongressDisplayName } from "@/lib/display";
 import type { FederalChamber } from "@/lib/types";
 import React from "react";
 import { ToggleGroup, ToggleGroupItem } from "../ui/toggle-group";
 import { FederalMap } from "./FederalMap";
+import { SearchInput } from "../shared/SearchInput";
 
 interface FederalControlPanelProps {
   congress: string;
@@ -203,11 +202,10 @@ export function FederalControlPanel({
                       </SelectContent>
                     </Select>
                   ) : (
-                    <Input
-                      type="text"
-                      placeholder="Search by name or zip"
+                    <SearchInput
                       value={searchInputValue}
-                      onChange={(e) => handleSearchChange(e.target.value)}
+                      onChange={handleSearchChange}
+                      placeholder="Search by name or zip"
                     />
                   )}
                 </div>

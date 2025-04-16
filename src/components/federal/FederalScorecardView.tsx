@@ -1,17 +1,16 @@
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { getIssueDisplayName } from "@/lib/display";
+import { getFederalLocationText, getIssueDisplayName } from "@/lib/display";
 import { getExpectation, getExpectationColor } from "@/lib/expectations";
-import { cn } from "@/lib/utils";
-import type { VisScorecardResponse, VisTable } from "@/services/api.types";
 import { getScorecardData, getTableData } from "@/services/api";
-import { ArrowLeft } from "lucide-react";
+import type { VisScorecardResponse, VisTable } from "@/services/api.types";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
-import { ScoreButton } from "../ScoreButton";
-import { ScoreMatrix } from "../ScoreMatrix";
-import { CongressSelector } from "./CongressSelector";
-import { FederalScorecardGlossary } from "./FederalScorecardGlossary";
+import { BackButton } from "@/components/shared/BackButton";
+import { PartyLabel } from "@/components/shared/PartyLabel";
+import { ScoreButton } from "@/components/shared/ScoreButton";
+import { ScoreMatrix } from "@/components/shared/ScoreMatrix";
+import { CongressSelector } from "@/components/federal/CongressSelector";
+import { FederalScorecardGlossary } from "@/components/federal/FederalScorecardGlossary";
 
 interface FederalScorecardProps {
   legislator: VisTable;
@@ -93,19 +92,14 @@ export function FederalScorecardView({
     }
   };
 
-  const locationText =
-    legislator.chamber === "S"
-      ? legislator.state
-      : `${legislator.state}-${legislator.district}`;
+  const locationText = getFederalLocationText(
+    legislator.chamber,
+    legislator.state,
+    legislator.district
+  );
 
   const expectation = getExpectation(legislator.les, legislator.benchmark);
   const expectationColor = getExpectationColor(expectation);
-
-  const partyBgColor = {
-    R: "bg-red-100",
-    D: "bg-blue-100",
-    I: "bg-gray-100",
-  }[legislator.party];
 
   // Get all possible issues and their scores, including zeros
   const issueScores = Object.entries(legislator.iles).sort(
@@ -118,18 +112,7 @@ export function FederalScorecardView({
 
   return (
     <div className="space-y-6">
-      <Button
-        variant="ghost"
-        onClick={onBack}
-        className={cn(
-          "mb-4 bg-gray-100 text-gray-600 hover:bg-gray-200 hover:text-gray-700",
-          "transition-colors duration-200"
-        )}
-      >
-        <ArrowLeft className="mr-2 h-4 w-4" />
-        Back
-      </Button>
-
+      <BackButton onClick={onBack} />
       <div className="grid grid-cols-[2fr,3fr] gap-6">
         <div className="space-y-6">
           <Card className="shadow-none border-0">
@@ -137,14 +120,7 @@ export function FederalScorecardView({
               <div className="space-y-1">
                 <CardTitle className="text-2xl">{legislator.name}</CardTitle>
                 <div className="text-sm text-muted-foreground flex gap-8 font-mono">
-                  <span
-                    className={cn(
-                      "w-6 h-6 flex items-center justify-center rounded",
-                      partyBgColor
-                    )}
-                  >
-                    {legislator.party}
-                  </span>
+                  <PartyLabel party={legislator.party} />
                   <span>{locationText}</span>
                 </div>
               </div>

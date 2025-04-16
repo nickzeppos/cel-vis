@@ -1,5 +1,5 @@
 import { FederalChamber } from "@/lib/types";
-import { GenericChamberSelector } from "../ChamberSelector";
+import { GenericChamberSelector } from "../shared/ChamberSelector";
 import { chamberLabels } from "@/lib/consts";
 
 export const FederalChamberSelector = (props: {

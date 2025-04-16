@@ -3,8 +3,8 @@ import { StateScorecardView } from "@/components/state/StateScorecardView";
 import { StateTableView } from "@/components/state/StateTableView";
 import { useStateState } from "@/hooks/useStateState";
 import type { ViewLevel } from "@/lib/types";
-import { LevelToggle } from "../LevelToggle";
-import { StateTableGlossary } from "./StateTableGlossary";
+import { LevelToggle } from "@/components/shared/LevelToggle";
+import { StateTableGlossary } from "@/components/state/StateTableGlossary";
 
 type StateRootProps = {
   level: ViewLevel;

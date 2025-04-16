@@ -1,6 +1,4 @@
-import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import {
   Select,
   SelectContent,
@@ -8,19 +6,24 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ArrowLeft } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { ExpectationIcon } from "../ExpectationIcon";
+import {
+  getStateLocationText,
+  getTermDisplayName,
+  getTermValue,
+} from "@/lib/display";
 import { getExpectation, getExpectationColor } from "@/lib/expectations";
-import { getTermDisplayName, getTermValue } from "@/lib/display";
-import { ScoreMatrix } from "../ScoreMatrix";
-import { StateScorecardGlossary } from "./StateScorecardGlossary";
 import { getStateScorecardData, getStateTableData } from "@/services/api";
 import type {
-  StateVisTable,
   StateVisScorecardResponse,
+  StateVisTable,
 } from "@/services/api.types";
+import { useState } from "react";
 import { toast } from "sonner";
+import { BackButton } from "@/components/shared/BackButton";
+import { ExpectationIcon } from "@/components/shared/ExpectationIcon";
+import { PartyLabel } from "@/components/shared/PartyLabel";
+import { ScoreMatrix } from "@/components/shared/ScoreMatrix";
+import { StateScorecardGlossary } from "@/components/state/StateScorecardGlossary";
 
 interface StateScorecardProps {
   legislator: StateVisTable;
@@ -83,13 +86,7 @@ export function StateScorecardView({
     }
   };
 
-  const locationText = `District ${legislator.district}`;
-
-  const partyBgColor = {
-    R: "bg-red-100",
-    D: "bg-blue-100",
-    "3rd": "bg-gray-100",
-  }[legislator.party];
+  const locationText = getStateLocationText(legislator.district);
 
   // Sort terms in descending order
   const sortedTerms =
@@ -101,18 +98,7 @@ export function StateScorecardView({
 
   return (
     <div className="space-y-6">
-      <Button
-        variant="ghost"
-        onClick={onBack}
-        className={cn(
-          "mb-4 bg-gray-100 text-gray-600 hover:bg-gray-200 hover:text-gray-700",
-          "transition-colors duration-200"
-        )}
-      >
-        <ArrowLeft className="mr-2 h-4 w-4" />
-        Back
-      </Button>
-
+      <BackButton onClick={onBack} />
       <div className="grid grid-cols-[2fr,3fr] gap-6">
         <div className="space-y-6">
           <Card className="shadow-none border-0">
@@ -120,14 +106,7 @@ export function StateScorecardView({
               <div className="space-y-1">
                 <CardTitle className="text-2xl">{legislator.name}</CardTitle>
                 <div className="text-sm text-muted-foreground flex gap-8 font-mono">
-                  <span
-                    className={cn(
-                      "w-6 h-6 flex items-center justify-center rounded",
-                      partyBgColor
-                    )}
-                  >
-                    {legislator.party}
-                  </span>
+                  <PartyLabel party={legislator.party} />
                   <span>{locationText}</span>
                 </div>
               </div>

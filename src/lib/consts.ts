@@ -12,4 +12,6 @@ export const chamberLabels: {
     lower: "Lower",
     upper: "Upper",
   },
-};
+} as const;
+
+export const AVAILABLE_STATES = ["GA", "MT"] as const;

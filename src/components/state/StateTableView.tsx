@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { StateLegislatorRow } from "./StateLegislatorRow";
-import { ColumnHeader } from "../ColumnHeader";
+import { StateLegislatorRow } from "@/components/state/StateLegislatorRow";
+import { ColumnHeader } from "@/components/shared/ColumnHeader";
 import { getStateTableData } from "@/services/api";
 import { StateVisTable } from "@/services/api.types";
 import { getStatePartyOrder } from "@/lib/parties";

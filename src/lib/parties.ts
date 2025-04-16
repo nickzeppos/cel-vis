@@ -1,12 +1,5 @@
 import { StateVisTable } from "@/services/api.types";
-import { StatePartyInitial } from "./types";
-
-type ChamberParties = {
-  H: string[];
-  S: string[];
-};
-
-type PartyOrderConfig = [number, ChamberParties][];
+import { PartyOrderConfig, StatePartyInitial } from "./types";
 
 export const partyOrder: PartyOrderConfig = [
   [93, { H: ["D", "R"], S: ["D", "R", "I"] }],

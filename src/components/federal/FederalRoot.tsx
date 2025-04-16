@@ -1,10 +1,10 @@
 import { useFederalState } from "@/hooks/useFederalState";
-import { ViewLevel } from "../../lib/types";
-import { LevelToggle } from "../LevelToggle";
-import { FederalControlPanel } from "./FederalControlPanel";
-import { FederalScorecardView } from "./FederalScorecardView";
-import { FederalTableGlossary } from "./FederalTableGlossary";
-import { FederalTableView } from "./FederalTableView";
+import { ViewLevel } from "@/lib/types";
+import { LevelToggle } from "@/components/shared/LevelToggle";
+import { FederalControlPanel } from "@/components/federal/FederalControlPanel";
+import { FederalScorecardView } from "@/components/federal/FederalScorecardView";
+import { FederalTableGlossary } from "@/components/federal/FederalTableGlossary";
+import { FederalTableView } from "@/components/federal/FederalTableView";
 
 type FederalRootProps = {
   level: ViewLevel;
@@ -37,7 +37,6 @@ function FederalRoot({ level, setLevel }: FederalRootProps) {
         <div className="w-full max-w-[1200px]">
           <div className="grid gap-x-6 gap-y-4 grid-cols-1 grid-rows-[min-content_min-content_min-content] grid-areas-mobile md:grid-cols-[1fr_2fr] md:grid-rows-[min-content_1fr] md:grid-areas-desktop">
             <div className="grid-in-a space-y-4">
-              {/* Control Panel */}
               <LevelToggle level={level} onLevelChange={setLevel} />
               <FederalControlPanel
                 congress={federalState.congress}

@@ -57,3 +57,10 @@ export const congressionalDistrictValidator = z.object({
   state: z.string(),
   district: z.number(),
 });
+
+export type ChamberParties = {
+  H: string[];
+  S: string[];
+};
+
+export type PartyOrderConfig = [number, ChamberParties][];

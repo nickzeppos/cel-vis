@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { FederalLegislatorRow } from "./FederalLegislatorRow";
-import { ColumnHeader } from "../ColumnHeader";
+import { FederalLegislatorRow } from "@/components/federal/FederalLegislatorRow";
+import { ColumnHeader } from "@/components/shared/ColumnHeader";
 import { cn } from "@/lib/utils";
 import { getFederalPartyOrder } from "@/lib/parties";
 import type { FederalChamber } from "@/lib/types";
