@@ -1,6 +1,7 @@
 import type { ViewRoute } from "@/lib/types";
 import { useState } from "react";
-import FederalRoot from "./components/federal/FederalRoot";
+import FederalRoot from "@/components/federal/FederalRoot";
+import { FederalScorecardView } from "@/components/federal/FederalScorecardView";
 
 const defaultRoute = { type: "federal:table" } as ViewRoute;
 function App() {
@@ -11,7 +12,12 @@ function App() {
     case "federal:table":
       return <FederalRoot route={route} setRoute={setRoute} />;
     case "federal:scorecard":
-      return <></>;
+      return (
+        <FederalScorecardView
+          legislator={route.legislator}
+          onBack={() => setRoute({ type: "federal:table" })}
+        />
+      );
     case "state:table":
       return <></>;
     case "state:scorecard":

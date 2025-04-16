@@ -14,33 +14,46 @@ import { FederalScorecardGlossary } from "@/components/federal/FederalScorecardG
 
 interface FederalScorecardProps {
   legislator: VisTable;
-  scorecard: VisScorecardResponse | null;
   onBack: () => void;
 }
 
 export function FederalScorecardView({
   legislator: initialLegislator,
-  scorecard: initialScorecard,
   onBack,
 }: FederalScorecardProps) {
   const [selectedIssue, setSelectedIssue] = useState<string>("overall");
   const [selectedCongress, setSelectedCongress] = useState<number>(
-    initialScorecard?.congress || 0
+    initialLegislator.congress
   );
   const [matrixHeight, setMatrixHeight] = useState<number>(0);
   const matrixRef = useRef<HTMLDivElement>(null);
   const issueListRef = useRef<HTMLDivElement>(null);
   const [legislator, setLegislator] = useState<VisTable>(initialLegislator);
-  const [scorecard, setScorecard] = useState<VisScorecardResponse | null>(
-    initialScorecard
-  );
+  const [scorecard, setScorecard] = useState<VisScorecardResponse | null>(null);
   const [_, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    const fetchInitialScorecard = async () => {
+      try {
+        const newScorecard = await getScorecardData(
+          legislator.congress,
+          legislator.bioguide
+        );
+        setScorecard(newScorecard);
+      } catch (err) {
+        console.error("Failed to fetch initial scorecard data:", err);
+        toast.error("Failed to load scorecard");
+      }
+    };
+
+    fetchInitialScorecard();
+  }, [legislator]);
 
   useEffect(() => {
     if (matrixRef.current) {
       setMatrixHeight(matrixRef.current.offsetHeight);
     }
-  }, []);
+  }, [scorecard]);
 
   // Scroll to selected issue whenever it changes or when congress changes
   useEffect(() => {

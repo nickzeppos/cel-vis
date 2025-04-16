@@ -10,7 +10,6 @@ export function useFederalState() {
   const [searchTerm, setSearchTerm] = useState("");
   const [stateFilter, setStateFilter] = useState("all");
   const [selectedIssue, setSelectedIssue] = useState("all");
-
   const [tableData, setTableData] = useState<VisTableResponse | null>(null);
 
   // Fetch initial table data on mount
