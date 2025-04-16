@@ -1,11 +1,7 @@
-import { useEffect, useState } from "react";
-import { getScorecardData, getTableData } from "@/services/api";
-import type {
-  VisTable,
-  VisScorecardResponse,
-  VisTableResponse,
-} from "@/services/api.types";
 import type { FederalChamber } from "@/lib/types";
+import { getTableData } from "@/services/api";
+import type { VisTableResponse } from "@/services/api.types";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 export function useFederalState() {
@@ -14,12 +10,6 @@ export function useFederalState() {
   const [searchTerm, setSearchTerm] = useState("");
   const [stateFilter, setStateFilter] = useState("all");
   const [selectedIssue, setSelectedIssue] = useState("all");
-
-  const [selectedLegislator, setSelectedLegislator] = useState<VisTable | null>(
-    null
-  );
-  const [selectedLegislatorScorecard, setSelectedLegislatorScorecard] =
-    useState<VisScorecardResponse | null>(null);
 
   const [tableData, setTableData] = useState<VisTableResponse | null>(null);
 
@@ -50,22 +40,6 @@ export function useFederalState() {
     }
   };
 
-  // Fetch scorecard when a legislator is selected
-  const handleFederalLegislatorSelect = async (legislator: VisTable) => {
-    try {
-      const scorecard = await getScorecardData(
-        parseInt(congress),
-        legislator.bioguide
-      );
-      setSelectedLegislatorScorecard(scorecard);
-      setSelectedLegislator(legislator);
-    } catch (err) {
-      console.error("Failed to fetch scorecard data:", err);
-      toast.error("Failed to load scorecard data");
-      setSelectedLegislator(legislator); // Still allow showing fallback view
-    }
-  };
-
   return {
     congress,
     setCongress,
@@ -77,12 +51,7 @@ export function useFederalState() {
     setStateFilter,
     selectedIssue,
     setSelectedIssue,
-    selectedLegislator,
-    setSelectedLegislator,
-    selectedLegislatorScorecard,
-    setSelectedLegislatorScorecard,
     tableData,
     handleCongressChange,
-    handleFederalLegislatorSelect,
   };
 }

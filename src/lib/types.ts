@@ -1,3 +1,4 @@
+import { StateVisTable, VisTable } from "@/services/api.types";
 import { z } from "zod";
 
 export type SortField = "name" | "rank" | "score";
@@ -64,3 +65,9 @@ export type ChamberParties = {
 };
 
 export type PartyOrderConfig = [number, ChamberParties][];
+
+export type ViewRoute =
+  | { type: "federal:table" }
+  | { type: "federal:scorecard"; legislator: VisTable }
+  | { type: "state:table" }
+  | { type: "state:scorecard"; legislator: StateVisTable; term: string };
