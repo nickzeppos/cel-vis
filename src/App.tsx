@@ -1,24 +1,24 @@
-import { useState, useEffect } from "react";
 import { FederalControlPanel } from "@/components/federal/FederalControlPanel";
-import { StateControlPanel } from "@/components/state/StateControlPanel";
-import { FederalTableView } from "@/components/federal/FederalTableView";
-import { StateTableView } from "@/components/state/StateTableView";
 import { FederalScorecardView } from "@/components/federal/FederalScorecardView";
-import { StateScorecardView } from "@/components/state/StateScorecardView";
+import { FederalTableView } from "@/components/federal/FederalTableView";
 import { LevelToggle } from "@/components/LevelToggle";
-import type { ViewLevel, FederalChamber, StateChamber } from "@/lib/types";
+import { StateControlPanel } from "@/components/state/StateControlPanel";
+import { StateScorecardView } from "@/components/state/StateScorecardView";
+import { StateTableView } from "@/components/state/StateTableView";
+import type { FederalChamber, StateChamber, ViewLevel } from "@/lib/types";
 import {
   getScorecardData,
   getStateScorecardData,
   getTableData,
 } from "@/services/api";
 import type {
+  StateVisScorecardResponse,
+  StateVisTable,
   VisScorecardResponse,
   VisTable,
-  StateVisTable,
-  StateVisScorecardResponse,
   VisTableResponse,
 } from "@/services/api.types";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { FederalTableGlossary } from "./components/federal/FederalTableGlossary";
 import { StateTableGlossary } from "./components/state/StateTableGlossary";
@@ -204,7 +204,7 @@ function App() {
             </div>
 
             <div className="grid-in-b space-y-4 min-h-[600px]">
-              <h1 className="text-3xl font-bold">DYNAMIC TITLE</h1>
+              <h1 className="text-3xl font-bold">NEW TITLE</h1>
 
               {level === "federal" ? (
                 <FederalTableView
