@@ -114,11 +114,6 @@ export function FederalScorecardView({
   const expectation = getExpectation(legislator.les, legislator.benchmark);
   const expectationColor = getExpectationColor(expectation);
 
-  // Get all possible issues and their scores, including zeros
-  const issueScores = Object.entries(legislator.iles).sort(
-    ([, a], [, b]) => b - a
-  );
-
   const matrix =
     scorecard?.data.issues[selectedIssue.toLowerCase()] ||
     scorecard?.data.overall;
@@ -172,7 +167,7 @@ export function FederalScorecardView({
                       paddingBottom: "8px",
                     }}
                   >
-                    {issueScores.map(([issue, score]) => (
+                    {Object.entries(legislator.iles).map(([issue, score]) => (
                       <ScoreButton
                         key={issue}
                         title={getIssueDisplayName(issue)}

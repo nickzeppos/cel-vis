@@ -8,8 +8,8 @@ import {
 } from "@/components/ui/select";
 import {
   getStateLocationText,
+  getValidTermDisplayName,
   getTermDisplayName,
-  getTermValue,
 } from "@/lib/display";
 import { getExpectation, getExpectationColor } from "@/lib/expectations";
 import { getStateScorecardData, getStateTableData } from "@/services/api";
@@ -17,41 +17,66 @@ import type {
   StateVisScorecardResponse,
   StateVisTable,
 } from "@/services/api.types";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { BackButton } from "@/components/shared/BackButton";
 import { ExpectationIcon } from "@/components/shared/ExpectationIcon";
 import { PartyLabel } from "@/components/shared/PartyLabel";
 import { ScoreMatrix } from "@/components/shared/ScoreMatrix";
 import { StateScorecardGlossary } from "@/components/state/StateScorecardGlossary";
+import { Term } from "@/lib/types";
 
 interface StateScorecardProps {
   legislator: StateVisTable;
-  scorecard: StateVisScorecardResponse | null;
-  initialTerm: string;
   onBack: () => void;
 }
 
 export function StateScorecardView({
   legislator: initialLegislator,
-  scorecard: initialScorecard,
-  initialTerm,
   onBack,
 }: StateScorecardProps) {
-  const [scorecard, setScorecard] = useState<StateVisScorecardResponse | null>(
-    initialScorecard
+  const [selectedTerm, setSelectedTerm] = useState<Term>(
+    initialLegislator.term
   );
-  const [selectedTerm, setSelectedTerm] = useState<string>(initialTerm);
   const [legislator, setLegislator] =
     useState<StateVisTable>(initialLegislator);
   const [isLoading, setIsLoading] = useState(false);
+  const [scorecard, setScorecard] = useState<StateVisScorecardResponse | null>(
+    null
+  );
+
+  useEffect(() => {
+    const fetchInitialScorecard = async () => {
+      try {
+        const newScorecard = await getStateScorecardData(
+          legislator.slesId,
+          legislator.term.startYear,
+          legislator.term.endYear
+        );
+        setScorecard(newScorecard);
+      } catch (err) {
+        console.error("failed to fetch initials corecard data:", err);
+        toast.error("Failed to load scorecard");
+      }
+    };
+
+    fetchInitialScorecard();
+  }, [legislator]);
 
   const handleTermChange = async (termString: string) => {
     setIsLoading(true);
 
-    const [startYear, endYear] = termString.split("-").map(Number);
-
+    const term = scorecard?.validTerms.find(
+      (term) => getTermDisplayName(term) === termString
+    );
+    if (!term) {
+      toast.error("Invalid term selected");
+      setIsLoading(false);
+      return;
+    }
+    const { startYear, endYear } = term;
     try {
+      // TODO: Add endpoint that supports atomic return for term + lesId rather than filtering response on this side
       // Fetch new table data first to get updated LES and rank
       const tableData = await getStateTableData(
         legislator.state,
@@ -75,7 +100,7 @@ export function StateScorecardView({
       );
 
       // Only update state if both fetches succeed
-      setSelectedTerm(termString);
+      setSelectedTerm(term);
       setLegislator(updatedLegislator);
       setScorecard(newScorecard);
     } catch (err) {
@@ -86,11 +111,8 @@ export function StateScorecardView({
     }
   };
 
+  // Location text
   const locationText = getStateLocationText(legislator.district);
-
-  // Sort terms in descending order
-  const sortedTerms =
-    scorecard?.validStateTerms?.sort((a, b) => b.startYear - a.startYear) || [];
 
   // Get expectation and color
   const expectation = getExpectation(legislator.sles, legislator.benchmark);
@@ -112,40 +134,39 @@ export function StateScorecardView({
               </div>
             </CardHeader>
             <CardContent className="space-y-6">
-              {scorecard?.validStateTerms &&
-                scorecard.validStateTerms.length > 0 && (
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-gray-700">
-                      TERM
-                    </label>
-                    <Select
-                      value={selectedTerm}
-                      onValueChange={handleTermChange}
-                      disabled={isLoading}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select term">
-                          {selectedTerm &&
-                            getTermDisplayName(
-                              sortedTerms.find(
-                                (term) => getTermValue(term) === selectedTerm
-                              )!
-                            )}
-                        </SelectValue>
-                      </SelectTrigger>
-                      <SelectContent>
-                        {sortedTerms.map((term) => (
-                          <SelectItem
-                            key={getTermValue(term)}
-                            value={getTermValue(term)}
-                          >
-                            {getTermDisplayName(term)}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                )}
+              {scorecard?.validTerms && scorecard.validTerms.length > 0 && (
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-gray-700">
+                    TERM
+                  </label>
+                  <Select
+                    value={getTermDisplayName(selectedTerm)}
+                    onValueChange={handleTermChange}
+                    disabled={isLoading}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select term">
+                        {selectedTerm &&
+                          getValidTermDisplayName(
+                            scorecard.validTerms.find(
+                              (term) => term === selectedTerm
+                            )!
+                          )}
+                      </SelectValue>
+                    </SelectTrigger>
+                    <SelectContent>
+                      {scorecard.validTerms.map((term) => (
+                        <SelectItem
+                          key={getTermDisplayName(term)}
+                          value={getTermDisplayName(term)}
+                        >
+                          {getValidTermDisplayName(term)}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
 
               <div className="flex flex-col h-full">
                 <div className="space-y-2">

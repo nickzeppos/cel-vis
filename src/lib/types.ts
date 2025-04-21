@@ -1,9 +1,6 @@
 import { StateVisTable, VisTable } from "@/services/api.types";
 import { z } from "zod";
 
-export type SortField = "name" | "rank" | "score";
-export type SortDirection = "asc" | "desc";
-
 export type FederalChamber = z.infer<typeof federalChamberValidator>;
 export type FederalChamberInitial = z.infer<
   typeof federalChamberInitialValidator
@@ -13,7 +10,7 @@ export type Chamber = z.infer<typeof chamberValidator>;
 export type ViewLevel = z.infer<typeof viewLevelValidator>;
 export type FederalPartyInitial = z.infer<typeof federalPartyInitialValidator>;
 export type StatePartyInitial = z.infer<typeof statePartyInitialValidator>;
-export type StateTerm = z.infer<typeof stateTermValidator>;
+export type Term = z.infer<typeof termValidator>;
 export type CongressionalDistrict = z.infer<
   typeof congressionalDistrictValidator
 >;
@@ -50,7 +47,7 @@ export const statePartyInitialValidator = z.union([
   majorPartyInitialValidator,
   z.literal("3rd"),
 ]);
-export const stateTermValidator = z.object({
+export const termValidator = z.object({
   startYear: z.number(),
   endYear: z.number(),
 });
@@ -58,6 +55,9 @@ export const congressionalDistrictValidator = z.object({
   state: z.string(),
   district: z.number(),
 });
+
+export type SortField = "name" | "rank" | "score";
+export type SortDirection = "asc" | "desc";
 
 export type ChamberParties = {
   H: string[];

@@ -47,12 +47,6 @@ export function FederalControlPanel({
   );
   const [searchInputValue, setSearchInputValue] = React.useState("");
   const { congressList = [], isLoading } = useCongressList();
-
-  // Sort available issues alphabetically by their display names
-  const sortedIssues = [...availableIssues].sort((a, b) =>
-    getIssueDisplayName(a).localeCompare(getIssueDisplayName(b))
-  );
-
   // Handle filter mode change
   const handleFilterModeChange = (value: string) => {
     if (value) {
@@ -142,7 +136,7 @@ export function FederalControlPanel({
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">All Issues</SelectItem>
-                    {sortedIssues.map((issue) => (
+                    {availableIssues.map((issue) => (
                       <SelectItem key={issue} value={issue}>
                         {getIssueDisplayName(issue)}
                       </SelectItem>

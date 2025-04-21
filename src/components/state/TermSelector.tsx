@@ -1,35 +1,51 @@
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { getTermDisplayName, getTermValue } from "@/lib/display";
-import type { StateTerm } from "@/lib/types";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { getValidTermDisplayName, getTermDisplayName } from "@/lib/display";
+import { ValidTerm } from "@/services/api.types";
 
 interface TermSelectorProps {
-  selectedTerm: string;
-  onTermChange: (term: string) => void;
-  validStateTerms?: Array<StateTerm & { chamber: 'upper' | 'lower' }>;
+  selectedTermString: string;
+  onTermChange: (termString: string) => void;
+  isLoading?: boolean;
+  validTerms?: Array<ValidTerm>;
 }
 
-export function TermSelector({ selectedTerm, onTermChange, validStateTerms = [] }: TermSelectorProps) {
-  // Sort terms in descending order
-  const sortedTerms = [...validStateTerms].sort((a, b) => b.startYear - a.startYear);
-
+export function TermSelector({
+  selectedTermString,
+  onTermChange,
+  isLoading = false,
+  validTerms = [],
+}: TermSelectorProps) {
   return (
     <div className="space-y-2">
       <label className="text-sm font-medium text-gray-700">TERM</label>
-      <Select value={selectedTerm} onValueChange={onTermChange}>
+      <Select
+        value={selectedTermString}
+        onValueChange={onTermChange}
+        disabled={isLoading}
+      >
         <SelectTrigger>
           <SelectValue placeholder="Select term">
-            {selectedTerm && validStateTerms?.find(term => getTermValue(term) === selectedTerm) && 
-              getTermDisplayName(validStateTerms.find(term => getTermValue(term) === selectedTerm)!)
-            }
+            {selectedTermString &&
+              getValidTermDisplayName(
+                validTerms.find(
+                  (term) => getTermDisplayName(term) === selectedTermString
+                )!
+              )}
           </SelectValue>
         </SelectTrigger>
         <SelectContent>
-          {sortedTerms.map(term => (
-            <SelectItem 
-              key={getTermValue(term)} 
-              value={getTermValue(term)}
+          {validTerms.map((term) => (
+            <SelectItem
+              key={getTermDisplayName(term)}
+              value={getTermDisplayName(term)}
             >
-              {getTermDisplayName(term)}
+              {getValidTermDisplayName(term)}
             </SelectItem>
           ))}
         </SelectContent>

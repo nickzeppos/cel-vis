@@ -1,7 +1,9 @@
 import type { ViewRoute } from "@/lib/types";
 import { useState } from "react";
-import FederalRoot from "@/components/federal/FederalRoot";
+import FederalTableView from "@/components/federal/FederalTableView";
 import { FederalScorecardView } from "@/components/federal/FederalScorecardView";
+import StateTableView from "./components/state/StateTableView";
+import { StateScorecardView } from "./components/state/StateScorecardView";
 
 const defaultRoute = { type: "federal:table" } as ViewRoute;
 function App() {
@@ -10,7 +12,7 @@ function App() {
   // switch render on route
   switch (route.type) {
     case "federal:table":
-      return <FederalRoot route={route} setRoute={setRoute} />;
+      return <FederalTableView route={route} setRoute={setRoute} />;
     case "federal:scorecard":
       return (
         <FederalScorecardView
@@ -19,9 +21,14 @@ function App() {
         />
       );
     case "state:table":
-      return <></>;
+      return <StateTableView route={route} setRoute={setRoute} />;
     case "state:scorecard":
-      return <></>;
+      return (
+        <StateScorecardView
+          legislator={route.legislator}
+          onBack={() => setRoute({ type: "state:table" })}
+        />
+      );
   }
 }
 

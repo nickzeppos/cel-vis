@@ -4,37 +4,12 @@ import {
   federalPartyInitialValidator,
   stateChamberValidator,
   statePartyInitialValidator,
-  stateTermValidator,
+  termValidator,
   congressionalDistrictValidator,
 } from "@/lib/types";
 
-// other
-export type ScoreMatrix = z.infer<typeof scoreMatrixValidator>;
-// Federal types
-export type VisTable = z.infer<typeof visTableValidator>;
-export type VisTableResponse = z.infer<typeof visTableResponseValidator>;
-export type VisScorecard = z.infer<typeof visScorecardValidator>;
-export type VisScorecardResponse = z.infer<
-  typeof visScorecardResponseValidator
->;
-export type CongressionalDistrict = z.infer<
-  typeof congressionalDistrictValidator
->;
-export type ValidCongress = z.infer<typeof validCongressValidator>;
-
-// State types
-export type StateVisTable = z.infer<typeof stateVisTableValidator>;
-export type StateVisTableResponse = z.infer<
-  typeof stateVisTableResponseValidator
->;
-export type StateVisScorecard = z.infer<typeof stateVisScorecardValidator>;
-export type StateVisScorecardResponse = z.infer<
-  typeof stateVisScorecardResponseValidator
->;
-export type StateTermResponse = z.infer<typeof stateTermResponseValidator>;
-
-// State validators
-
+// Shared
+// Validators
 export const scoreMatrixValidator = z.object({
   c_bill: z.number(),
   c_aic: z.number(),
@@ -52,40 +27,24 @@ export const scoreMatrixValidator = z.object({
   ss_pass: z.number(),
   ss_law: z.number(),
 });
+// Types
+export type ScoreMatrix = z.infer<typeof scoreMatrixValidator>;
 
-export const validStateTermValidator = stateTermValidator.merge(
-  z.object({ chamber: stateChamberValidator })
-);
-export const stateTermResponseValidator = z.array(stateTermValidator);
-export const stateVisScorecardValidator = z.object({
-  overall: scoreMatrixValidator,
-});
-
-export const stateVisScorecardResponseValidator = z.object({
-  data: stateVisScorecardValidator,
-  slesId: z.number(),
-  term: stateTermValidator,
-  validStateTerms: z.array(validStateTermValidator),
-});
-export const stateVisTableValidator = z.object({
-  term: stateTermValidator,
-  chamber: stateChamberValidator,
-  state: z.string(),
-  slesId: z.number(),
-  name: z.string(),
-  party: statePartyInitialValidator,
-  district: z.number().nullable(),
-  sles: z.number(),
-  benchmark: z.number(),
-  partyRank: z.number(),
-  partyTotal: z.number(),
-  isMajority: z.boolean(),
-});
-export const stateVisTableResponseValidator = z.object({
-  data: z.array(stateVisTableValidator),
-  term: stateTermValidator,
-});
-
+// Federal
+// Types
+export type CongressList = z.infer<typeof congressListValidator>;
+export type VisTable = z.infer<typeof visTableValidator>;
+export type VisTableResponse = z.infer<typeof visTableResponseValidator>;
+export type VisScorecard = z.infer<typeof visScorecardValidator>;
+export type VisScorecardResponse = z.infer<
+  typeof visScorecardResponseValidator
+>;
+export type CongressionalDistrict = z.infer<
+  typeof congressionalDistrictValidator
+>;
+export type ValidCongress = z.infer<typeof validCongressValidator>;
+// Validators
+export const congressListValidator = z.array(z.number());
 export const visTableValidator = z.object({
   congress: z.number(),
   chamber: federalChamberInitialValidator,
@@ -121,4 +80,51 @@ export const visScorecardResponseValidator = z.object({
   congress: z.number(),
   bioguide: z.string(),
   data: visScorecardValidator,
+});
+
+// State
+// Types
+export type StateVisTable = z.infer<typeof stateVisTableValidator>;
+export type StateVisTableResponse = z.infer<
+  typeof stateVisTableResponseValidator
+>;
+export type StateVisScorecard = z.infer<typeof stateVisScorecardValidator>;
+export type StateVisScorecardResponse = z.infer<
+  typeof stateVisScorecardResponseValidator
+>;
+export type ValidTerm = z.infer<typeof validTermValidator>;
+export type TermResponse = z.infer<typeof termResponseValidator>;
+
+// Validators
+export const validTermValidator = termValidator.merge(
+  z.object({ chamber: stateChamberValidator })
+);
+export const termResponseValidator = z.array(termValidator);
+export const stateVisScorecardValidator = z.object({
+  overall: scoreMatrixValidator,
+});
+
+export const stateVisScorecardResponseValidator = z.object({
+  data: stateVisScorecardValidator,
+  slesId: z.number(),
+  term: termValidator,
+  validTerms: z.array(validTermValidator),
+});
+export const stateVisTableValidator = z.object({
+  term: termValidator,
+  chamber: stateChamberValidator,
+  state: z.string(),
+  slesId: z.number(),
+  name: z.string(),
+  party: statePartyInitialValidator,
+  district: z.number().nullable(),
+  sles: z.number(),
+  benchmark: z.number(),
+  partyRank: z.number(),
+  partyTotal: z.number(),
+  isMajority: z.boolean(),
+});
+export const stateVisTableResponseValidator = z.object({
+  data: z.array(stateVisTableValidator),
+  term: termValidator,
 });

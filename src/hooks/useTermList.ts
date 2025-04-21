@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
 import { getTermList } from "@/services/api";
-import { StateTerm } from "@/lib/types";
+import { Term } from "@/lib/types";
 
 export function useTermList(state: string) {
-  const [termList, setTermList] = useState<Array<StateTerm>>([]);
+  const [termList, setTermList] = useState<Array<Term>>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 

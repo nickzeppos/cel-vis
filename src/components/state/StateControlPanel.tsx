@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { useTermList } from "@/hooks/useTermList";
-import { getTermValue } from "@/lib/display";
+import { getTermDisplayName } from "@/lib/display";
 import type { StateChamber } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import React, { useEffect } from "react";
@@ -56,12 +56,12 @@ export function StateControlPanel({
     if (!selectedState || isLoading || termList.length === 0) return;
 
     const termExists = termList.some(
-      (term) => getTermValue(term) === selectedTerm
+      (term) => getTermDisplayName(term) === selectedTerm
     );
 
     if (!termExists) {
       const mostRecentTerm = termList[0];
-      onTermChange(getTermValue(mostRecentTerm));
+      onTermChange(getTermDisplayName(mostRecentTerm));
     }
   }, [selectedState, termList, isLoading]);
 
@@ -127,10 +127,10 @@ export function StateControlPanel({
                       <SelectContent>
                         {termList.map((term) => (
                           <SelectItem
-                            key={getTermValue(term)}
-                            value={getTermValue(term)}
+                            key={getTermDisplayName(term)}
+                            value={getTermDisplayName(term)}
                           >
-                            {getTermValue(term)}
+                            {getTermDisplayName(term)}
                           </SelectItem>
                         ))}
                       </SelectContent>
