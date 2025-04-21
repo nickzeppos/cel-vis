@@ -5,12 +5,12 @@ import { LevelToggle } from "@/components/shared/LevelToggle";
 import { useFederalState } from "@/hooks/useFederalState";
 import { ViewRoute } from "@/lib/types";
 
-type FederalRootProps = {
+type FederalTableViewProps = {
   route: ViewRoute;
   setRoute: (route: ViewRoute) => void;
 };
 
-function FederalTableView({ route, setRoute }: FederalRootProps) {
+function FederalTableView({ setRoute }: FederalTableViewProps) {
   const federalState = useFederalState();
 
   return (

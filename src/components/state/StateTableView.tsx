@@ -5,11 +5,11 @@ import { StateTable } from "@/components/state/StateTable";
 import { useStateState as useStateRootState } from "@/hooks/useStateState";
 import { ViewRoute } from "@/lib/types";
 
-type StateRootProps = {
+type StateTableViewProps = {
   route: ViewRoute;
   setRoute: (route: ViewRoute) => void;
 };
-function StateTableView({ route, setRoute }: StateRootProps) {
+function StateTableView({ setRoute }: StateTableViewProps) {
   const stateState = useStateRootState();
 
   return (
