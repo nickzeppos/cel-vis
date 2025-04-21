@@ -1,8 +1,10 @@
 import type { VisTable } from "@/services/api.types";
-import { ExpectationIcon } from "../ExpectationIcon";
+import { ExpectationIcon } from "../shared/ExpectationIcon";
 import { getExpectation, getExpectationColor } from "@/lib/expectations";
 import { ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { partyColors } from "@/lib/colors";
+import { getFederalLocationText } from "@/lib/display";
 
 interface FederalLegislatorRowProps {
   legislator: VisTable;
@@ -15,10 +17,11 @@ export function FederalLegislatorRow({
   selectedIssue = "all",
   onClick,
 }: FederalLegislatorRowProps) {
-  const locationText =
-    legislator.chamber === "S"
-      ? legislator.state
-      : `${legislator.state}-${legislator.district}`;
+  const locationText = getFederalLocationText(
+    legislator.chamber,
+    legislator.state,
+    legislator.district
+  );
 
   const score =
     selectedIssue === "all"
@@ -37,12 +40,6 @@ export function FederalLegislatorRow({
     ? getExpectationColor(expectation)
     : undefined;
 
-  const partyBgColor = {
-    R: "bg-red-100",
-    D: "bg-blue-100",
-    I: "bg-gray-100",
-  }[legislator.party];
-
   return (
     <div
       className="hover:bg-gray-50 cursor-pointer transition-colors border-b last:border-b-0 group relative"
@@ -56,7 +53,7 @@ export function FederalLegislatorRow({
               <span
                 className={cn(
                   "w-6 h-6 flex items-center justify-center rounded",
-                  partyBgColor
+                  partyColors[legislator.party]
                 )}
               >
                 {legislator.party}

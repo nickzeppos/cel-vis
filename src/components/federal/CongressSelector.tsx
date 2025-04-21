@@ -1,37 +1,45 @@
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { getCongressDisplayName } from "@/lib/congress";
-import { getChamberDisplayName } from "@/lib/display";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { getValidCongressDisplayName } from "@/lib/display";
 import type { ValidCongress } from "@/services/api.types";
 
 interface CongressSelectorProps {
-  validCongresses: ValidCongress[];
+  validCongresses: Array<ValidCongress>;
   selectedCongress: number;
   onCongressChange: (congress: number) => void;
+  isLoading?: boolean;
 }
 
-export function CongressSelector({ 
+export function CongressSelector({
   validCongresses,
   selectedCongress,
-  onCongressChange
+  onCongressChange,
+  isLoading = false,
 }: CongressSelectorProps) {
-  // Sort congresses in descending order and find the current congress's chamber
-  const sortedCongresses = [...validCongresses].sort(([a], [b]) => b - a);
-  const currentChamber = validCongresses.find(([congress]) => congress === selectedCongress)?.[1] || 'H';
+  const currentChamber =
+    validCongresses.find(([congress]) => congress === selectedCongress)?.[1] ||
+    "H";
 
   return (
-    <Select 
-      value={selectedCongress.toString()} 
+    <Select
+      value={selectedCongress.toString()}
       onValueChange={(value) => onCongressChange(parseInt(value))}
+      disabled={isLoading}
     >
       <SelectTrigger className="w-full">
         <SelectValue>
-          {getCongressDisplayName(selectedCongress)} {getChamberDisplayName(currentChamber)}
+          {getValidCongressDisplayName([selectedCongress, currentChamber])}
         </SelectValue>
       </SelectTrigger>
       <SelectContent>
-        {sortedCongresses.map(([congress, chamber]) => (
+        {validCongresses.map(([congress, chamber]) => (
           <SelectItem key={congress} value={congress.toString()}>
-            {getCongressDisplayName(congress)} {getChamberDisplayName(chamber)}
+            {getValidCongressDisplayName([congress, chamber])}
           </SelectItem>
         ))}
       </SelectContent>

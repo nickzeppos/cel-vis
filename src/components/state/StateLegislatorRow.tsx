@@ -1,8 +1,10 @@
 import { ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { ExpectationIcon } from "../ExpectationIcon";
+import { ExpectationIcon } from "@/components/shared/ExpectationIcon";
 import { getExpectation, getExpectationColor } from "@/lib/expectations";
 import { StateVisTable } from "@/services/api.types";
+import { partyColors } from "@/lib/colors";
+import { getStateLocationText } from "@/lib/display";
 
 interface StateLegislatorRowProps {
   legislator: StateVisTable;
@@ -13,13 +15,7 @@ export function StateLegislatorRow({
   legislator,
   onClick,
 }: StateLegislatorRowProps) {
-  const locationText = `District ${legislator.district}`;
-
-  const statePartyBgColor = {
-    R: "bg-red-100",
-    D: "bg-blue-100",
-    "3rd": "bg-gray-100",
-  }[legislator.party];
+  const locationText = getStateLocationText(legislator.district);
 
   const expectation = getExpectation(legislator.sles, legislator.benchmark);
   const expectationColor = getExpectationColor(expectation);
@@ -37,7 +33,7 @@ export function StateLegislatorRow({
               <span
                 className={cn(
                   "w-6 h-6 flex items-center justify-center rounded",
-                  statePartyBgColor
+                  partyColors[legislator.party]
                 )}
               >
                 {legislator.party}

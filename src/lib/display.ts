@@ -1,4 +1,31 @@
-import type { StateChamber } from "@/lib/types";
+import type { FederalChamberInitial, StateChamber } from "@/lib/types";
+import { ValidCongress, ValidTerm } from "@/services/api.types";
+
+export const getCongressDisplayName = (congress: number): string => {
+  const j = congress % 10;
+  const k = congress % 100;
+  let suffix = "th";
+  if (j === 1 && k !== 11) suffix = "st";
+  else if (j === 2 && k !== 12) suffix = "nd";
+  else if (j === 3 && k !== 13) suffix = "rd";
+  return `${congress}${suffix}`;
+};
+
+export const getValidCongressDisplayName = ([
+  congress,
+  chamber,
+]: ValidCongress): string => {
+  const chamberName = getChamberDisplayName(chamber);
+  return `${getCongressDisplayName(congress)} ${chamberName}`;
+};
+
+export const getStateLocationText = (district: number | null): string =>
+  `District ${district}`;
+export const getFederalLocationText = (
+  chamber: FederalChamberInitial,
+  state: string,
+  district: number | null
+): string => (chamber === "S" ? state : `${state}-${district}`);
 
 export const issueDisplayNames: { [issue: string]: string } = {
   agriculture: "Agriculture",
@@ -38,18 +65,12 @@ export const getStateChamberDisplayName = (chamber: StateChamber): string => {
   return chamber === "upper" ? "Upper" : "Lower";
 };
 
-export interface TermDisplayInfo {
-  startYear: number;
-  endYear: number;
-  chamber: StateChamber;
-}
-
-export const getTermDisplayName = (term: TermDisplayInfo): string => {
+export const getValidTermDisplayName = (term: ValidTerm): string => {
   const chamberName = getStateChamberDisplayName(term.chamber);
   return `${term.startYear}-${term.endYear} ${chamberName}`;
 };
 
-export const getTermValue = (term: {
+export const getTermDisplayName = (term: {
   startYear: number;
   endYear: number;
 }): string => {

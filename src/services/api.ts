@@ -4,40 +4,43 @@
 import { congressionalDistrictValidator } from "@/lib/types";
 import {
   type CongressionalDistrict,
-  StateTermResponse,
-  stateTermResponseValidator,
+  CongressList,
+  congressListValidator,
   type StateVisScorecardResponse,
   stateVisScorecardResponseValidator,
   type StateVisTableResponse,
   stateVisTableResponseValidator,
+  TermResponse,
+  termResponseValidator,
   type VisScorecardResponse,
   visScorecardResponseValidator,
   type VisTableResponse,
   visTableResponseValidator,
 } from "@/services/api.types";
+import { sortDescending } from "./api.utils";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-// const API_BASE_URL = `http://localhost:3000`;
 
-/**
- * Returns a list of available Congress sessions
- * @returns Promise<Array<number>> Array of Congress numbers (e.g., [117, 118])
- */
-export async function getCongressList(): Promise<Array<number>> {
+export async function getCongressList(): Promise<CongressList> {
   const response = await fetch(`${API_BASE_URL}/vis/congress`);
 
   if (!response.ok) {
     throw new Error("Failed to fetch Congress list");
   }
   const data = await response.json();
-  return data;
+  const safelyParsed = congressListValidator.safeParse(data);
+
+  if (!safelyParsed.success) {
+    console.error("Error parsing Congress list:", safelyParsed.error.format());
+    throw new Error("Failed to parse Congress list");
+  }
+
+  // sort stage
+  const sorted = sortDescending(safelyParsed.data, (congress) => congress);
+  return sorted;
 }
 
-/**
- * Returns a list of available terms for the state
- * @param state The state abbreviation (e.g., 'GA')
- */
-export async function getTermList(state: string): Promise<StateTermResponse> {
+export async function getTermList(state: string): Promise<TermResponse> {
   const url = `${API_BASE_URL}/vis/stateTerms`;
   const queryParams = new URLSearchParams({
     state: state,
@@ -47,18 +50,17 @@ export async function getTermList(state: string): Promise<StateTermResponse> {
     throw new Error("Failed to fetch term list");
   }
   const data = await response.json();
-  const safelyParsed = stateTermResponseValidator.safeParse(data);
+  const safelyParsed = termResponseValidator.safeParse(data);
   if (!safelyParsed.success) {
     console.error("Error parsing term list:", safelyParsed.error.format());
     throw new Error("Failed to parse term list");
   }
-  return safelyParsed.data;
+
+  // sort stage
+  const sorted = sortDescending(safelyParsed.data, (term) => term.startYear);
+  return sorted;
 }
-/**
- * Returns legislator data for a specific congress
- * @param congress The congress number to fetch data for
- * @returns Promise<VisTableResponse> The legislator data
- */
+
 export async function getTableData(
   congress: number
 ): Promise<VisTableResponse> {
@@ -80,15 +82,21 @@ export async function getTableData(
     );
     throw new Error("Failed to parse legislator data");
   }
+  // sort stage
+
+  // This is a bit bloated because iles is a record and scorecard component expects it as such
+  // Not a big deal, just flagging it as a not very beautiful use of the generic sort util.
+  safelyParsed.data.data.forEach((legislator) => {
+    const iles = sortDescending(
+      Object.entries(legislator.iles),
+      ([_, score]) => score
+    );
+    legislator.iles = Object.fromEntries(iles);
+  });
+
   return safelyParsed.data;
 }
 
-/**
- * Returns score components data for a specific congress and bioguide ID
- * @param congress The congress number to fetch data for
- * @param bioguide The bioguide ID of the legislator
- * @returns Promise<VisScorecardResponse> The score components data
- */
 export async function getScorecardData(
   congress: number,
   bioguide: string
@@ -109,14 +117,16 @@ export async function getScorecardData(
   if (!safelyParsed.success) {
     throw new Error("Failed to parse scorecard data");
   }
+
+  // sort stage
+  safelyParsed.data.data.validCongresses = sortDescending(
+    safelyParsed.data.data.validCongresses,
+    ([congress]) => congress
+  );
+
   return safelyParsed.data;
 }
 
-/**
- * Function for looking up congressional districts by ZIP code
- * @param zip The ZIP code to look up
- * @returns Promise<CongressionalDistrict | undefined> The congressional district info, or undefined if not found
- */
 export async function getDistrictForZip(
   zip: string
 ): Promise<CongressionalDistrict | undefined> {
@@ -140,13 +150,6 @@ export async function getDistrictForZip(
   return safelyParsed.data;
 }
 
-/**
- * Returns state legislator data for a specific state and term
- * @param state The state abbreviation
- * @param startYear The start year of the term
- * @param endYear The end year of the term
- * @returns Promise<StateVisTableResponse> The state legislator data
- */
 export async function getStateTableData(
   state: string,
   startYear: number,
@@ -177,13 +180,6 @@ export async function getStateTableData(
   return safelyParsed.data;
 }
 
-/**
- * Returns score components data for a specific state legislator
- * @param slesId The unique identifier for the state legislator
- * @param startYear The start year of the term
- * @param endYear The end year of the term
- * @returns Promise<StateVisScorecardResponse> The state legislator's score components
- */
 export async function getStateScorecardData(
   slesId: number,
   startYear: number,
@@ -210,6 +206,11 @@ export async function getStateScorecardData(
   if (!safelyParsed.success) {
     throw new Error("Failed to parse state scorecard data");
   }
+  // sort stage
+  safelyParsed.data.validTerms = sortDescending(
+    safelyParsed.data.validTerms,
+    (term) => term.startYear
+  );
 
   return safelyParsed.data;
 }

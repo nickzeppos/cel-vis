@@ -1,6 +1,5 @@
-import { StateChamberSelector } from "@/components/ChamberSelector";
+import { StateChamberSelector } from "@/components/state/StateChamberSelector";
 import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -10,14 +9,16 @@ import {
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { useTermList } from "@/hooks/useTermList";
-import { getTermValue } from "@/lib/display";
+import { getTermDisplayName } from "@/lib/display";
 import type { StateChamber } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import React, { useEffect } from "react";
-import { StateMap } from "./StateMap";
+import { SearchInput } from "@/components/shared/SearchInput";
+import { StateMap } from "@/components/state/StateMap";
+import { AVAILABLE_STATES } from "@/lib/consts";
 
 // States with available data
-const AVAILABLE_STATES = ["GA", "MT"] as const;
+
 interface StateControlPanelProps {
   selectedState: string;
   selectedTerm: string;
@@ -55,12 +56,12 @@ export function StateControlPanel({
     if (!selectedState || isLoading || termList.length === 0) return;
 
     const termExists = termList.some(
-      (term) => getTermValue(term) === selectedTerm
+      (term) => getTermDisplayName(term) === selectedTerm
     );
 
     if (!termExists) {
       const mostRecentTerm = termList[0];
-      onTermChange(getTermValue(mostRecentTerm));
+      onTermChange(getTermDisplayName(mostRecentTerm));
     }
   }, [selectedState, termList, isLoading]);
 
@@ -68,54 +69,6 @@ export function StateControlPanel({
     setSearchInputValue(value);
     onSearchChange(value);
   };
-
-  // const [searchInputValue, setSearchInputValue] = React.useState("");
-  // const { termList = [], isLoading, error } = useTermList(selectedState);
-  // const handleStateSelect = (state: string) => {
-  //   // If going from selected state to unselected state, clear term and chamber
-  //   if (state === "") {
-  //     onStateSelect("");
-  //     onTermChange("");
-  //     onChamberChange("lower");
-  //     return;
-  //   }
-
-  //   // If going from unselected state to selected state, set default term and chamber
-  //   if (!selectedState) {
-  //     const availableTerms = stateTerms[state] || [];
-  //     if (availableTerms.length > 0) {
-  //       const mostRecentTerm = availableTerms[0];
-  //       onStateSelect(state);
-  //       onTermChange(getTermValue(mostRecentTerm));
-  //       onChamberChange(mostRecentTerm.chamber);
-  //       return;
-  //     }
-  //   }
-
-  //   // If switching between states, keep the current term if it exists in the new state
-  //   const availableTerms = stateTerms[state] || [];
-  //   const termExists = availableTerms.some(
-  //     (term) => getTermValue(term) === selectedTerm
-  //   );
-
-  //   onStateSelect(state);
-
-  //   if (!termExists && availableTerms.length > 0) {
-  //     // If current term doesn't exist in new state, set to most recent term
-  //     const mostRecentTerm = availableTerms[0];
-  //     onTermChange(getTermValue(mostRecentTerm));
-  //     onChamberChange(mostRecentTerm.chamber);
-  //   }
-  // };
-
-  // // Handle search input change
-  // const handleSearchChange = (value: string) => {
-  //   setSearchInputValue(value);
-  //   onSearchChange(value);
-  // };
-
-  // // Get available terms for the selected state
-  // const availableTerms = selectedState ? stateTerms[selectedState] || [] : [];
 
   return (
     <div className="space-y-4">
@@ -174,10 +127,10 @@ export function StateControlPanel({
                       <SelectContent>
                         {termList.map((term) => (
                           <SelectItem
-                            key={getTermValue(term)}
-                            value={getTermValue(term)}
+                            key={getTermDisplayName(term)}
+                            value={getTermDisplayName(term)}
                           >
-                            {getTermValue(term)}
+                            {getTermDisplayName(term)}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -195,11 +148,10 @@ export function StateControlPanel({
                     <label className="text-sm font-medium text-gray-700">
                       SEARCH BY NAME
                     </label>
-                    <Input
-                      type="text"
-                      placeholder="Search by name"
+                    <SearchInput
                       value={searchInputValue}
-                      onChange={(e) => handleSearchChange(e.target.value)}
+                      onChange={handleSearchChange}
+                      placeholder="Search by name"
                     />
                   </div>
                 </>

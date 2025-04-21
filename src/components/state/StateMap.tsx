@@ -1,4 +1,4 @@
-import { Map } from "@/components/Map";
+import { Map } from "@/components/shared/Map";
 
 interface StateMapProps {
   selectedState: string;
@@ -6,7 +6,7 @@ interface StateMapProps {
 }
 
 // States with available data
-const AVAILABLE_STATES = ['GA', 'MT'] as const;
+const AVAILABLE_STATES = ["GA", "MT"] as const;
 
 export function StateMap({ selectedState, onStateSelect }: StateMapProps) {
   return (
