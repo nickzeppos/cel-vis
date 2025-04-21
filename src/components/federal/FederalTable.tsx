@@ -89,11 +89,29 @@ export function FederalTable({
   const handleSort = (field: SortField) => {
     if (selectedIssue !== "all" && field === "rank") return;
 
+    // If same field, toggle
     if (sortField === field) {
       setSortDirection(sortDirection === "asc" ? "desc" : "asc");
-    } else {
-      setSortField(field);
+      return;
+    }
+
+    // Handle other fields
+    if (field === "name") {
+      setSortField("name");
+      setSortDirection("asc");
+      return;
+    }
+
+    if (field === "rank") {
+      setSortField("rank");
+      setSortDirection("asc");
+      return;
+    }
+
+    if (field === "score") {
+      setSortField("score");
       setSortDirection("desc");
+      return;
     }
   };
 
