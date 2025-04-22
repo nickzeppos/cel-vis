@@ -72,6 +72,10 @@ export type ViewRoute =
   | { type: "state:table" }
   | { type: "state:scorecard"; legislator: StateVisTable; term: string };
 
-  export type GroupedFederalRow =
+export type GroupedFederalRow =
   | { type: "group"; party: string }
   | { type: "legislator"; data: VisTable };
+
+export type GroupedStateRow =
+  | { type: "group"; party: string }
+  | { type: "legislator"; data: StateVisTable };

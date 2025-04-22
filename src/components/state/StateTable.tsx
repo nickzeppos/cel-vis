@@ -1,10 +1,16 @@
 import { useState, useEffect } from "react";
-import { StateLegislatorRow } from "@/components/state/StateLegislatorRow";
-import { ColumnHeader } from "@/components/shared/ColumnHeader";
+import { StateTableRow } from "@/components/state/StateTableRow";
 import { getStateTableData } from "@/services/api";
 import { StateVisTable } from "@/services/api.types";
-import { getStatePartyOrder } from "@/lib/parties";
-import { SortDirection, SortField } from "@/lib/types";
+import { BaseTable } from "@/components/shared/BaseTable";
+import { getStateTableRows } from "@/lib/transforms";
+import { SortField, SortDirection, GroupedStateRow } from "@/lib/types";
+
+const partyNames: Record<string, string> = {
+  D: "Democrat",
+  R: "Republican",
+  I: "Independent",
+};
 
 interface StateTableProps {
   selectedState: string;
@@ -40,7 +46,7 @@ export function StateTable({
           startYear,
           endYear
         );
-        setLegislatorsData(response.data.filter((l) => l.chamber === chamber));
+        setLegislatorsData(response.data);
       } catch (err) {
         setError("Failed to load legislator data");
         console.error(err);
@@ -53,179 +59,88 @@ export function StateTable({
   }, [selectedState, selectedTerm, chamber]);
 
   const handleSort = (field: SortField) => {
-    // If same field, toggle
     if (sortField === field) {
       setSortDirection(sortDirection === "asc" ? "desc" : "asc");
-      return;
-    }
-
-    // Handle other fields
-    if (field === "name") {
-      setSortField("name");
-      setSortDirection("asc");
-      return;
-    }
-
-    if (field === "rank") {
-      setSortField("rank");
-      setSortDirection("asc");
-      return;
-    }
-
-    if (field === "score") {
-      setSortField("score");
-      setSortDirection("desc");
-      return;
+    } else {
+      setSortField(field);
+      setSortDirection(field === "score" ? "desc" : "asc");
     }
   };
 
-  const filteredLegislators = legislatorsData
-    .filter((legislator) => {
-      if (!searchTerm) return true;
-      return legislator.name.toLowerCase().includes(searchTerm.toLowerCase());
-    })
-    .sort((a, b) => {
-      const direction = sortDirection === "asc" ? 1 : -1;
-      switch (sortField) {
-        case "name":
-          return direction * a.name.localeCompare(b.name);
-        case "rank":
-          return direction * (a.partyRank - b.partyRank);
-        case "score":
-          return direction * (a.sles - b.sles);
-        default:
-          return 0;
-      }
-    });
-
-  // Only group by party when sorting by score
-  const shouldGroupByParty = sortField === "score";
-
-  let displayLegislators;
-  if (shouldGroupByParty) {
-    // Get party order for current congress and chamber
-    const partyOrderForCongress = getStatePartyOrder(legislatorsData, chamber);
-
-    // Group legislators by party
-    const groupedLegislators = filteredLegislators.reduce(
-      (groups, legislator) => {
-        const party = legislator.party;
-        if (!groups[party]) {
-          groups[party] = [];
-        }
-        groups[party].push(legislator);
-        return groups;
-      },
-      {} as Record<string, typeof filteredLegislators>
-    );
-
-    // Sort parties according to congress-specific order
-    displayLegislators = (
-      <>
-        {partyOrderForCongress
-          .filter((party) => groupedLegislators[party]?.length > 0)
-          .map((party) => (
-            <div key={party} className="border-b last:border-b-0">
-              <div className="py-2 px-4 font-bold bg-muted">
-                {party === "D"
-                  ? "Democrat"
-                  : party === "R"
-                  ? "Republican"
-                  : "Independent"}
-              </div>
-              {groupedLegislators[party].map((legislator) => (
-                <StateLegislatorRow
-                  key={legislator.slesId}
-                  legislator={legislator}
-                  onClick={() => onLegislatorSelect(legislator, selectedTerm)}
-                />
-              ))}
-            </div>
-          ))}
-      </>
-    );
-  } else {
-    // When not sorting by score, display as a flat list
-    displayLegislators = (
-      <div className="border-b last:border-b-0">
-        {filteredLegislators.map((legislator) => (
-          <StateLegislatorRow
-            key={legislator.slesId}
-            legislator={legislator}
-            onClick={() => onLegislatorSelect(legislator, selectedTerm)}
-          />
-        ))}
-      </div>
-    );
-  }
-
-  // Show loading state
-  if (isLoading) {
-    return <div className="text-xl">Loading legislator data...</div>;
-  }
-
-  // Show error state
-  if (error) {
-    return <div className="text-xl text-red-500">{error}</div>;
-  }
+  const tableRows: GroupedStateRow[] = getStateTableRows({
+    legislators: legislatorsData,
+    chamber,
+    searchTerm,
+    sortField,
+    sortDirection,
+  });
 
   return (
-    // if selected state is not null, show column headerse and table, else just show table
-    // if selected state is not null but no legislators found, show "No results found"
-    // if selected state is null, show "Select a state to view legislators"
-
-    <div className="flex-1 min-w-0 flex flex-col bg-card rounded-lg border">
-      <div className="sticky top-0 z-10 bg-card rounded-t-lg">
-        <div className="flex border-b">
-          <div className="w-[400px] p-4">
-            <ColumnHeader
-              type="state"
-              label="Name"
-              sortField="name"
-              currentSort={sortField}
-              direction={sortDirection}
-              onSort={handleSort}
-            />
+    <BaseTable<GroupedStateRow>
+      type="state"
+      minWidth="900px"
+      data={tableRows}
+      headers={[
+        {
+          name: "Name",
+          width: "w-[50%]",
+          sortField: "name",
+          currentSort: sortField,
+          direction: sortDirection,
+          onSort: handleSort,
+        },
+        {
+          name: "Party Rank",
+          width: "w-[15%]",
+          sortField: "rank",
+          currentSort: sortField,
+          direction: sortDirection,
+          onSort: handleSort,
+        },
+        {
+          name: "Benchmark",
+          width: "w-[15%]",
+        },
+        {
+          name: "SLES",
+          width: "w-[20%]",
+          sortField: "score",
+          currentSort: sortField,
+          direction: sortDirection,
+          onSort: handleSort,
+        },
+      ]}
+      TableRowComponent={({ row }) =>
+        row.type === "group" ? (
+          <tr>
+            <td colSpan={4} className="px-4 py-2 font-bold bg-muted">
+              {partyNames[row.party] ?? row.party}
+            </td>
+          </tr>
+        ) : (
+          <StateTableRow
+            row={row.data}
+            onClick={() => onLegislatorSelect(row.data, selectedTerm)}
+          />
+        )
+      }
+      emptyState={
+        isLoading ? (
+          <div className="py-8 text-muted-foreground text-center text-sm">
+            Loading legislator data...
           </div>
-          <div className="w-[140px] p-4">
-            <ColumnHeader
-              type="state"
-              label="Party Rank"
-              sortField="rank"
-              currentSort={sortField}
-              direction={sortDirection}
-              onSort={handleSort}
-            />
-          </div>
-          <div className="w-[120px] p-4">
-            <div className="font-medium">Benchmark</div>
-          </div>
-          <div className="w-[120px] p-4">
-            <ColumnHeader
-              type="state"
-              label="SLES"
-              sortField="score"
-              currentSort={sortField}
-              direction={sortDirection}
-              onSort={handleSort}
-            />
-          </div>
-        </div>
-      </div>
-
-      <div className="flex-1 overflow-y-auto">
-        {displayLegislators}
-        {!selectedState && (
-          <div className="text-center text-muted-foreground py-8">
+        ) : error ? (
+          <div className="py-8 text-red-500 text-center text-sm">{error}</div>
+        ) : !selectedState ? (
+          <div className="py-8 text-muted-foreground text-center text-sm">
             Select a state to view legislators
           </div>
-        )}
-        {selectedState && filteredLegislators.length === 0 && (
-          <div className="text-center text-muted-foreground py-8">
+        ) : (
+          <div className="py-8 text-muted-foreground text-center text-sm">
             No results found
           </div>
-        )}
-      </div>
-    </div>
+        )
+      }
+    />
   );
 }

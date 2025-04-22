@@ -98,7 +98,6 @@ export function FederalTable({
     congress,
   });
 
-
   return (
     <BaseTable<GroupedFederalRow>
       type="federal"
@@ -122,7 +121,9 @@ export function FederalTable({
           direction: sortDirection,
           onSort: handleSort,
           disabled: selectedIssue !== "all",
-          className: cn(selectedIssue !== "all" && "opacity-50 cursor-not-allowed"),
+          className: cn(
+            selectedIssue !== "all" && "opacity-50 cursor-not-allowed"
+          ),
         },
         {
           name: "Benchmark",
@@ -132,7 +133,7 @@ export function FederalTable({
         {
           name: "LES",
           width: "w-[20%]",
-        sortField: "score",
+          sortField: "score",
           currentSort: sortField,
           direction: sortDirection,
           onSort: handleSort,
