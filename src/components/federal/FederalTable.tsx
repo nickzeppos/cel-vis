@@ -104,6 +104,7 @@ export function FederalTable({
       type="federal"
       minWidth="900px"
       data={tableRows}
+      emptyState={isLoading ? "Loading data..." : error ?? "No data available."}
       headers={[
         {
           name: "Name",
