@@ -1,0 +1,82 @@
+# Layout Specifications
+
+## Embedding Context
+This application is embedded in a WordPress site via an iframe (GitHub Pages).
+Key constraints:
+- Parent container width: 1200px (WP theme)
+- Margins: Inherited from WP theme (don't need to set)
+- Our max container width: 1180px (allows for safe padding)
+- Must avoid horizontal scrolling within iframe
+- App.tsx includes height messaging to parent window to prevent double scrollbars
+  * Function sends dynamic height updates to parent iframe
+  * Parent adjusts iframe height accordingly
+  * Ensures single scrollbar at page level only
+
+## Grid Areas
+- Mobile (< 768px):
+  A (Control Panel)
+  B (Table)
+  C (Glossary)
+
+- Desktop (≥ 768px):
+  A | B
+  C | B
+
+## Component Sizes
+
+### Control Panel (A)
+- Min width: 328px (accommodates map grid)
+  * Map grid: 12 columns × 20px = 240px
+  * Map gaps: 11 gaps × 8px = 88px
+- Max width: 1fr (flex grow within constraints)
+- Padding: 16px
+- Spacing between items: 16px
+
+### Table Area (B)
+- Min width: 600px
+- Max width: 2fr (twice the size of control panel)
+- Column distribution:
+  * Name: 50%
+  * Party Rank: 15%
+  * Benchmark: 15%
+  * Score: 20%
+
+### Glossary (C)
+- Width: matches Control Panel
+- Min height: content
+- Padding: 16px
+
+## Container Constraints
+- Max width: 1180px (20px buffer from WP container)
+- Horizontal padding: 16px
+- Vertical padding: 32px
+- Gap between areas: 16px (sm), 24px (md+)
+
+## Breakpoints
+- sm: 640px
+- md: 768px (primary desktop breakpoint)
+- lg: 1024px
+- xl: 1280px
+
+## Map Grid
+- Tile size: 20px × 20px
+- Gap between tiles: 8px
+- Grid: 12 columns × 8 rows
+
+## Responsive Behavior
+1. Mobile:
+   - Stack all sections vertically
+   - Full width components
+   - Scrollable table with horizontal overflow
+
+2. Desktop:
+   - Two-column layout
+   - Fixed control panel width
+   - Expandable table area
+   - Glossary below control panel
+
+## Accessibility
+- Min touch target size: 44px × 44px
+- Min text contrast ratio: 4.5:1
+- Focus indicators must be visible
+- Interactive elements must be keyboard accessible
