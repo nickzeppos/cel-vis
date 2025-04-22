@@ -26,7 +26,7 @@ export function StateLegislatorRow({
       onClick={onClick}
     >
       <div className="flex items-center pr-12">
-        <div className="w-[400px] p-4">
+        <div className="w-[400px] pl-4">
           <div className="space-y-1">
             <div className="font-medium">{legislator.name}</div>
             <div className="text-sm text-muted-foreground flex gap-8 font-mono">
@@ -42,15 +42,15 @@ export function StateLegislatorRow({
             </div>
           </div>
         </div>
-        <div className="w-[140px] p-4 flex items-center font-mono">
+        <div className="w-[140px] pl-4 flex items-center font-mono">
           <span className="whitespace-nowrap">
             {legislator.partyRank}/{legislator.partyTotal}
           </span>
         </div>
-        <div className="w-[120px] p-4 flex items-center font-mono">
+        <div className="w-[120px] pl-4 flex items-center font-mono">
           <span>{legislator.benchmark.toFixed(3)}</span>
         </div>
-        <div className="w-[120px] p-4 flex items-center">
+        <div className="w-[120px] pl-4 flex items-center">
           <span
             className="font-mono text-lg"
             style={{ color: expectationColor }}
