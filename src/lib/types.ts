@@ -71,3 +71,7 @@ export type ViewRoute =
   | { type: "federal:scorecard"; legislator: VisTable }
   | { type: "state:table" }
   | { type: "state:scorecard"; legislator: StateVisTable; term: string };
+
+  export type GroupedFederalRow =
+  | { type: "group"; party: string }
+  | { type: "legislator"; data: VisTable };

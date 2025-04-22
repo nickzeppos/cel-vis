@@ -25,7 +25,6 @@ function App() {
     };
     sendHeightToParent();
     window.addEventListener("resize", sendHeightToParent); // listen for resizes
-
     return () => {
       window.removeEventListener("resize", sendHeightToParent);
     };
