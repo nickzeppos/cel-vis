@@ -10,28 +10,21 @@ function App() {
   const [route, setRoute] = useState<ViewRoute>(defaultRoute);
 
   useEffect(() => {
-    // Function to send height to parent
     const sendHeightToParent = () => {
-      const height = document.body.scrollHeight;
+      const height = document.documentElement.scrollHeight;
+      console.log("[iframe] Sending height:", height);
       if (window.parent) {
         window.parent.postMessage(
           {
             type: "setHeight",
             height: height,
           },
-          "*" // TODO: control target origin w/ env
+          "*"
         );
       }
     };
-
-    // Send height when component mounts
     sendHeightToParent();
-
-    // Send height when window resizes
-    window.addEventListener("resize", sendHeightToParent);
-
-    // Optional: Send height when content changes
-    // You might need to call this function after data loads or UI updates
+    window.addEventListener("resize", sendHeightToParent); // listen for resizes
 
     return () => {
       window.removeEventListener("resize", sendHeightToParent);
