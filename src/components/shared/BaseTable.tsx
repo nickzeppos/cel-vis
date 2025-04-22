@@ -27,7 +27,7 @@ interface BaseTableProps<T> {
   }>;
   data?: Array<any>;
   TableRowComponent: React.ComponentType<{ key: string, row: T }>;
-  emptyState?: React.ReactNode;
+  emptyState: React.ReactNode;
 }
 
 export function BaseTable<T>({
@@ -78,7 +78,7 @@ export function BaseTable<T>({
                 <TableCell colSpan={headers.length} className="h-[400px]">
                   <div className="flex items-center justify-center">
                     <div className="text-center text-muted-foreground">
-                      {emptyState || "No data available"}
+                      {emptyState}
                     </div>
                   </div>
                 </TableCell>
