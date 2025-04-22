@@ -80,6 +80,13 @@ export function StateTable({
       type="state"
       minWidth="900px"
       data={tableRows}
+      emptyState={
+        isLoading
+          ? "Loading data..."
+          : selectedState
+          ? "Select a state to view data."
+          : error ?? "No data available."
+      }
       headers={[
         {
           name: "Name",
@@ -122,23 +129,6 @@ export function StateTable({
             row={row.data}
             onClick={() => onLegislatorSelect(row.data, selectedTerm)}
           />
-        )
-      }
-      emptyState={
-        isLoading ? (
-          <div className="py-8 text-muted-foreground text-center text-sm">
-            Loading legislator data...
-          </div>
-        ) : error ? (
-          <div className="py-8 text-red-500 text-center text-sm">{error}</div>
-        ) : !selectedState ? (
-          <div className="py-8 text-muted-foreground text-center text-sm">
-            Select a state to view legislators
-          </div>
-        ) : (
-          <div className="py-8 text-muted-foreground text-center text-sm">
-            No results found
-          </div>
         )
       }
     />
