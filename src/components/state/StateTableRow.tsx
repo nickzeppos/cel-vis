@@ -24,7 +24,7 @@ export function StateTableRow({ row, onClick }: StateTableRowProps) {
       className="relative cursor-pointer group hover:bg-muted/40"
     >
       {/* Name + Party + Location */}
-      <TableCell className="w-[50%] p-4">
+      <TableCell className="w-[50%] pl-4">
         <div className="font-medium">{row.name}</div>
         <div className="text-sm text-muted-foreground flex gap-8 font-mono">
           <span
@@ -40,17 +40,17 @@ export function StateTableRow({ row, onClick }: StateTableRowProps) {
       </TableCell>
 
       {/* Party Rank */}
-      <TableCell className="w-[15%] p-4 font-mono">
+      <TableCell className="w-[15%] pl-4 font-mono">
         {row.partyRank}/{row.partyTotal}
       </TableCell>
 
       {/* Benchmark */}
-      <TableCell className="w-[15%] p-4 font-mono">
+      <TableCell className="w-[15%] pl-4 font-mono">
         {row.benchmark.toFixed(3)}
       </TableCell>
 
       {/* SLES + Expectation */}
-      <TableCell className="w-[20%] p-4 font-mono">
+      <TableCell className="w-[20%] pl-4 font-mono">
         <span style={{ color: expectationColor }}>{row.sles.toFixed(3)}</span>
         <ExpectationIcon
           expectation={expectation}
