@@ -207,8 +207,8 @@ export async function getStateScorecardData(
     throw new Error("Failed to parse state scorecard data");
   }
   // sort stage
-  safelyParsed.data.validTerms = sortDescending(
-    safelyParsed.data.validTerms,
+  safelyParsed.data.validStateTerms = sortDescending(
+    safelyParsed.data.validStateTerms,
     (term) => term.startYear
   );
 

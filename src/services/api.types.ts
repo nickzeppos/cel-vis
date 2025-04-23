@@ -108,7 +108,7 @@ export const stateVisScorecardResponseValidator = z.object({
   data: stateVisScorecardValidator,
   slesId: z.number(),
   term: termValidator,
-  validTerms: z.array(validTermValidator),
+  validStateTerms: z.array(validTermValidator),
 });
 export const stateVisTableValidator = z.object({
   term: termValidator,

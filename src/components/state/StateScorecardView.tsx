@@ -66,7 +66,7 @@ export function StateScorecardView({
   const handleTermChange = async (termString: string) => {
     setIsLoading(true);
 
-    const term = scorecard?.validTerms.find(
+    const term = scorecard?.validStateTerms.find(
       (term) => getTermDisplayName(term) === termString
     );
     if (!term) {
@@ -134,39 +134,48 @@ export function StateScorecardView({
               </div>
             </CardHeader>
             <CardContent className="space-y-6">
-              {scorecard?.validTerms && scorecard.validTerms.length > 0 && (
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-gray-700">
-                    TERM
-                  </label>
-                  <Select
-                    value={getTermDisplayName(selectedTerm)}
-                    onValueChange={handleTermChange}
-                    disabled={isLoading}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select term">
-                        {selectedTerm &&
-                          getValidTermDisplayName(
-                            scorecard.validTerms.find(
-                              (term) => term === selectedTerm
-                            )!
-                          )}
-                      </SelectValue>
-                    </SelectTrigger>
-                    <SelectContent>
-                      {scorecard.validTerms.map((term) => (
-                        <SelectItem
-                          key={getTermDisplayName(term)}
-                          value={getTermDisplayName(term)}
-                        >
-                          {getValidTermDisplayName(term)}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              )}
+              {scorecard?.validStateTerms &&
+                scorecard.validStateTerms.length > 0 && (
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-gray-700">
+                      TERM
+                    </label>
+                    <Select
+                      value={getTermDisplayName(selectedTerm)}
+                      onValueChange={handleTermChange}
+                      disabled={isLoading}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select term">
+                          {selectedTerm &&
+                            (() => {
+                              const matchingTerm =
+                                scorecard?.validStateTerms?.find(
+                                  (term) =>
+                                    term.startYear === selectedTerm.startYear &&
+                                    term.endYear === selectedTerm.endYear
+                                );
+
+                              // Use the matching term if found, otherwise just show the display name
+                              return matchingTerm
+                                ? getValidTermDisplayName(matchingTerm)
+                                : getTermDisplayName(selectedTerm);
+                            })()}
+                        </SelectValue>
+                      </SelectTrigger>
+                      <SelectContent>
+                        {scorecard.validStateTerms.map((term) => (
+                          <SelectItem
+                            key={getTermDisplayName(term)}
+                            value={getTermDisplayName(term)}
+                          >
+                            {getValidTermDisplayName(term)}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
 
               <div className="flex flex-col h-full">
                 <div className="space-y-2">

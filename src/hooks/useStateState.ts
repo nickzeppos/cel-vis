@@ -1,20 +1,27 @@
 import type { StateChamber } from "@/lib/types";
-import { useState } from "react";
+import { useTableState } from "@/context/TableStateContext";
 
 export function useStateState() {
-  const [selectedState, setSelectedState] = useState("");
-  const [selectedTerm, setSelectedTerm] = useState("");
-  const [stateChamber, setStateChamber] = useState<StateChamber>("lower");
-  const [stateSearchTerm, setStateSearchTerm] = useState("");
+  const { stateTableState, updateStateTableState } = useTableState();
+
+  const { selectedState, selectedTerm, stateChamber, stateSearchTerm } =
+    stateTableState;
 
   return {
     selectedState,
-    setSelectedState,
+    setSelectedState: (state: string) =>
+      updateStateTableState({ selectedState: state }),
+
     selectedTerm,
-    setSelectedTerm,
+    setSelectedTerm: (term: string) =>
+      updateStateTableState({ selectedTerm: term }),
+
     stateChamber,
-    setStateChamber,
+    setStateChamber: (chamber: StateChamber) =>
+      updateStateTableState({ stateChamber: chamber }),
+
     stateSearchTerm,
-    setStateSearchTerm,
+    setStateSearchTerm: (term: string) =>
+      updateStateTableState({ stateSearchTerm: term }),
   };
 }
