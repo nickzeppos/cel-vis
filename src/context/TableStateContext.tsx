@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState } from "react";
 import type { FederalChamber } from "@/lib/types";
-import type { VisTableResponse } from "@/services/api.types";
+import { VisTableResponse } from "@/services/api.types";
 
 type FederalTableState = {
   congress: string;

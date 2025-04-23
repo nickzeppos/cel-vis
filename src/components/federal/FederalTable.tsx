@@ -1,10 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { cn } from "@/lib/utils";
 import { partyNames } from "@/lib/consts";
 import type { GroupedFederalRow, SortField, SortDirection } from "@/lib/types";
 import type { FederalChamber } from "@/lib/types";
 import type { VisTable, CongressionalDistrict } from "@/services/api.types";
-import { getTableData, getDistrictForZip } from "@/services/api";
+import { getDistrictForZip, getTableData } from "@/services/api";
 import { BaseTable } from "@/components/shared/BaseTable";
 import { FederalTableRow } from "@/components/federal/FederalTableRow";
 import { getFederalTableRows } from "@/lib/transforms";
@@ -26,6 +26,7 @@ export function FederalTable({
   selectedIssue,
   onLegislatorSelect,
 }: FederalTableProps) {
+  const [currentCongress, setCurrentCongress] = useState<string>(congress);
   const [sortField, setSortField] = useState<SortField>("score");
   const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
   const [legislators, setLegislators] = useState<Array<VisTable>>([]);
@@ -36,11 +37,17 @@ export function FederalTable({
 
   useEffect(() => {
     const fetchData = async () => {
-      setIsLoading(true);
-      setError(null);
+      // When congress changes, set loading state and clear error state
+      if (congress !== currentCongress) {
+        setIsLoading(true);
+        setError(null);
+      }
       try {
+        // Being fetching data for congress
         const response = await getTableData(parseInt(congress));
         setLegislators(response.data);
+        // Set the current congress to the one fetched
+        setCurrentCongress(congress);
       } catch (err) {
         setError("Failed to load legislator data");
         console.error(err);
@@ -49,6 +56,7 @@ export function FederalTable({
       }
     };
 
+    // fetch
     fetchData();
   }, [congress]);
 
@@ -86,7 +94,19 @@ export function FederalTable({
     }
   };
 
-  const tableRows: GroupedFederalRow[] = getFederalTableRows({
+  const tableRows = useMemo(() => {
+    return getFederalTableRows({
+      legislators,
+      chamber,
+      stateFilter,
+      searchTerm,
+      districtFromZip,
+      selectedIssue,
+      sortField,
+      sortDirection,
+      congress: currentCongress,
+    });
+  }, [
     legislators,
     chamber,
     stateFilter,
@@ -95,8 +115,11 @@ export function FederalTable({
     selectedIssue,
     sortField,
     sortDirection,
-    congress,
-  });
+    currentCongress,
+  ]);
+
+  // If loading, show empty state
+  // const displayRows = isLoading ? [] : tableRows;
 
   return (
     <BaseTable<GroupedFederalRow>

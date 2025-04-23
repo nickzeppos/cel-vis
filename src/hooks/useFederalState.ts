@@ -1,8 +1,8 @@
 import { useTableState } from "@/context/TableStateContext";
 import type { FederalChamber } from "@/lib/types";
 import { getTableData } from "@/services/api";
+import { visTableResponseValidator } from "@/services/api.types";
 import { useEffect } from "react";
-import { toast } from "sonner";
 
 export function useFederalState() {
   const { federalState, updateFederalState } = useTableState();
@@ -16,35 +16,40 @@ export function useFederalState() {
     tableData,
   } = federalState;
 
-  // Fetch initial table data if not already loaded
+  // Fetch initial data if not already present
   useEffect(() => {
-    if (tableData === null) {
-      const fetchInitialData = async () => {
-        try {
-          const data = await getTableData(parseInt(congress));
-          updateFederalState({ tableData: data });
-        } catch (err) {
-          console.error("Failed to fetch initial table data:", err);
-          toast.error("Failed to load legislator data");
-        }
-      };
+    const fetchData = async () => {
+      if (tableData === null) {
+        // Set loading state
 
-      fetchInitialData();
-    }
+        try {
+          const response = await getTableData(parseInt(congress));
+          const safelyParsed = visTableResponseValidator.safeParse(response);
+          if (!safelyParsed.success) {
+            console.error(
+              "Error parsing table data:",
+              safelyParsed.error.format()
+            );
+            throw new Error("Failed to parse table data");
+          }
+          // Update state with fetched data
+          updateFederalState({
+            tableData: safelyParsed.data,
+          });
+        } catch (err) {
+          console.error("Failed to fetch table data:", err);
+        }
+      }
+    };
+
+    fetchData();
   }, [congress, tableData, updateFederalState]);
 
   // Fetch table data when user switches Congress
-  const handleCongressChange = async (newCongress: string) => {
-    try {
-      const data = await getTableData(parseInt(newCongress));
-      updateFederalState({
-        congress: newCongress,
-        tableData: data,
-      });
-    } catch (err) {
-      console.error("Failed to fetch table data:", err);
-      toast.error("Failed to load legislator data");
-    }
+  const handleCongressChange = (newCongress: string) => {
+    updateFederalState({
+      congress: newCongress,
+    });
   };
 
   return {
@@ -60,7 +65,7 @@ export function useFederalState() {
     selectedIssue,
     setSelectedIssue: (selectedIssue: string) =>
       updateFederalState({ selectedIssue }),
-    tableData,
     handleCongressChange,
+    tableData,
   };
 }
