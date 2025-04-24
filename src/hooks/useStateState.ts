@@ -1,5 +1,5 @@
-import type { StateChamber } from "@/lib/types";
 import { useTableState } from "@/context/TableStateContext";
+import type { StateChamber } from "@/lib/types";
 
 export function useStateState() {
   const { stateTableState, updateStateTableState } = useTableState();

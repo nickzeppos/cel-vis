@@ -14,6 +14,7 @@ export function StateMap({ selectedState, onStateSelect }: StateMapProps) {
       selectedState={selectedState}
       onStateSelect={onStateSelect}
       isAvailable={(stateCode) => AVAILABLE_STATES.includes(stateCode as any)}
+      deselectValue=""
     />
   );
 }

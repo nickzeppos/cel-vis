@@ -81,7 +81,7 @@ export function StateControlPanel({
                 FILTER BY STATE
               </label>
               <Select
-                value={selectedState === "all" ? "" : selectedState}
+                value={selectedState || ""}
                 onValueChange={handleStateSelect}
               >
                 <SelectTrigger>
@@ -145,10 +145,8 @@ export function StateControlPanel({
 
                   {/* Search by name */}
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-gray-700">
-                      SEARCH BY NAME
-                    </label>
                     <SearchInput
+                      label="SEARCH"
                       value={searchInputValue}
                       onChange={handleSearchChange}
                       placeholder="Search by name"

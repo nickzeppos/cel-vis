@@ -10,6 +10,7 @@ interface MapProps {
   selectedState: string;
   onStateSelect: (state: string) => void;
   isAvailable?: (stateCode: string) => boolean;
+  deselectValue?: string;
 }
 
 export interface TileMap {
@@ -83,7 +84,12 @@ Object.entries(states).forEach(([stateCode, [col, row]]) => {
   stateGrid[row][col] = { id: stateCode };
 });
 
-export function Map({ selectedState, onStateSelect, isAvailable }: MapProps) {
+export function Map({
+  selectedState,
+  onStateSelect,
+  isAvailable,
+  deselectValue = "all",
+}: MapProps) {
   return (
     <div className="w-full flex justify-center">
       <div
@@ -103,7 +109,9 @@ export function Map({ selectedState, onStateSelect, isAvailable }: MapProps) {
                       onClick={() => {
                         if (!isAvailable || isAvailable(state.id)) {
                           onStateSelect(
-                            state.id === selectedState ? "all" : state.id
+                            state.id === selectedState
+                              ? deselectValue
+                              : state.id
                           );
                         }
                       }}

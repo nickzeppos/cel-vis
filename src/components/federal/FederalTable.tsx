@@ -1,13 +1,18 @@
-import { useState, useEffect, useMemo } from "react";
-import { cn } from "@/lib/utils";
-import { partyNames } from "@/lib/consts";
-import type { GroupedFederalRow, SortField, SortDirection } from "@/lib/types";
-import type { FederalChamber } from "@/lib/types";
-import type { VisTable, CongressionalDistrict } from "@/services/api.types";
-import { getDistrictForZip, getTableData } from "@/services/api";
-import { BaseTable } from "@/components/shared/BaseTable";
 import { FederalTableRow } from "@/components/federal/FederalTableRow";
+import { BaseTable } from "@/components/shared/BaseTable";
+import { partyNames } from "@/lib/consts";
 import { getFederalTableRows } from "@/lib/transforms";
+import type {
+  FederalChamber,
+  GroupedFederalRow,
+  SortDirection,
+  SortField,
+} from "@/lib/types";
+import { cn } from "@/lib/utils";
+import { getDistrictForZip, getTableData } from "@/services/api";
+import type { CongressionalDistrict, VisTable } from "@/services/api.types";
+import { useEffect, useMemo, useState } from "react";
+import { FederalTableTitle } from "./FederalTableTitle";
 
 interface FederalTableProps {
   congress: string;
@@ -94,8 +99,8 @@ export function FederalTable({
     }
   };
 
-  const tableRows = useMemo(() => {
-    return getFederalTableRows({
+  const { tableRows, summaryStats } = useMemo(() => {
+    const tableRows = getFederalTableRows({
       legislators,
       chamber,
       stateFilter,
@@ -106,6 +111,34 @@ export function FederalTable({
       sortDirection,
       congress: currentCongress,
     });
+
+    const flatRows = tableRows
+      .filter(
+        (r): r is { type: "legislator"; data: VisTable } =>
+          r.type === "legislator"
+      )
+      .map((r) => r.data)
+      .filter((leg) => {
+        const score =
+          selectedIssue === "all"
+            ? leg.les
+            : leg.iles[selectedIssue.toLowerCase().replace(/\s+/g, "")] ?? 0;
+        return score !== 0;
+      });
+
+    const numLegislators = flatRows.length;
+
+    const partyCounts = flatRows.reduce((acc, leg) => {
+      acc[leg.party] = (acc[leg.party] ?? 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
+
+    const summaryStats = {
+      numLegislators,
+      partyCounts,
+    };
+
+    return { tableRows, summaryStats };
   }, [
     legislators,
     chamber,
@@ -118,11 +151,17 @@ export function FederalTable({
     currentCongress,
   ]);
 
-  // If loading, show empty state
-  // const displayRows = isLoading ? [] : tableRows;
-
   return (
     <BaseTable<GroupedFederalRow>
+      TableTitleComponent={
+        <FederalTableTitle
+          congress={congress}
+          chamber={chamber}
+          state={stateFilter}
+          selectedIssue={selectedIssue}
+          summary={summaryStats}
+        />
+      }
       type="federal"
       minWidth="900px"
       data={tableRows}

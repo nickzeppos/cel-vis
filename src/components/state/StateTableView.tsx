@@ -16,7 +16,6 @@ function StateTableView({ setRoute }: StateTableViewProps) {
 
   return (
     <BaseTableView
-      title="DYNAMIC TITLE"
       levelToggle={
         <LevelToggle
           level="state"

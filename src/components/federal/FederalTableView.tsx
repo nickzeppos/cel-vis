@@ -1,8 +1,8 @@
 import { FederalControlPanel } from "@/components/federal/FederalControlPanel";
-import { FederalTableGlossary } from "@/components/federal/FederalTableGlossary";
 import { FederalTable } from "@/components/federal/FederalTable";
-import { LevelToggle } from "@/components/shared/LevelToggle";
+import { FederalTableGlossary } from "@/components/federal/FederalTableGlossary";
 import { BaseTableView } from "@/components/shared/BaseTableView";
+import { LevelToggle } from "@/components/shared/LevelToggle";
 import { useFederalState } from "@/hooks/useFederalState";
 import { ViewRoute } from "@/lib/types";
 
@@ -16,7 +16,6 @@ function FederalTableView({ setRoute }: FederalTableViewProps) {
 
   return (
     <BaseTableView
-      title="DYNAMIC TITLE"
       levelToggle={
         <LevelToggle
           level="federal"

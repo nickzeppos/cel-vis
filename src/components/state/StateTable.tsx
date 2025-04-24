@@ -1,10 +1,12 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { StateTableRow } from "@/components/state/StateTableRow";
 import { getStateTableData } from "@/services/api";
 import { StateVisTable } from "@/services/api.types";
 import { BaseTable } from "@/components/shared/BaseTable";
 import { getStateTableRows } from "@/lib/transforms";
 import { SortField, SortDirection, GroupedStateRow } from "@/lib/types";
+import { getStatePartyOrder } from "@/lib/parties";
+import { StateTableTitle } from "./StateTableTitle";
 
 const partyNames: Record<string, string> = {
   D: "Democrat",
@@ -35,8 +37,12 @@ export function StateTable({
 
   useEffect(() => {
     const fetchData = async () => {
-      if (!selectedState || !selectedTerm) return;
-
+      if (selectedState === "" || selectedTerm === "") {
+        setIsLoading(false);
+        setLegislatorsData([]);
+        setError(null);
+        return;
+      }
       setIsLoading(true);
       setError(null);
       try {
@@ -67,16 +73,48 @@ export function StateTable({
     }
   };
 
-  const tableRows: GroupedStateRow[] = getStateTableRows({
-    legislators: legislatorsData,
-    chamber,
-    searchTerm,
-    sortField,
-    sortDirection,
-  });
+  const { tableRows, summary } = useMemo(() => {
+    const tableRows = getStateTableRows({
+      legislators: legislatorsData,
+      chamber,
+      searchTerm,
+      sortField,
+      sortDirection,
+    });
+
+    const flatRows = tableRows
+      .filter(
+        (r): r is { type: "legislator"; data: StateVisTable } =>
+          r.type === "legislator"
+      )
+      .map((r) => r.data)
+      .filter((leg) => leg.sles !== 0);
+
+    const numLegislators = flatRows.length;
+
+    const partyCounts = flatRows.reduce((acc, leg) => {
+      acc[leg.party] = (acc[leg.party] ?? 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
+
+    const partyOrder = getStatePartyOrder(flatRows, chamber);
+
+    return {
+      tableRows,
+      summary: { numLegislators, partyCounts, orderedParties: partyOrder },
+    };
+  }, [legislatorsData, chamber, searchTerm, sortField, sortDirection]);
 
   return (
     <BaseTable<GroupedStateRow>
+      TableTitleComponent={
+        <StateTableTitle
+          chamber={chamber}
+          selectedState={selectedState}
+          selectedTerm={selectedTerm}
+          summary={summary}
+        />
+      }
       type="state"
       minWidth="900px"
       data={tableRows}

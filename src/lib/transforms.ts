@@ -188,3 +188,12 @@ export function getStateTableRows({
   // Flat row list
   return sorted.map((l) => ({ type: "legislator", data: l }));
 }
+
+export function flattenGroupedRows(rows: GroupedFederalRow[]): VisTable[] {
+  return rows
+    .filter(
+      (r): r is { type: "legislator"; data: VisTable } =>
+        r.type === "legislator"
+    )
+    .map((r) => r.data);
+}

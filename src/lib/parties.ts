@@ -1,6 +1,6 @@
 import { StateVisTable } from "@/services/api.types";
-import { StatePartyInitial } from "./types";
 import { partyOrder } from "./consts";
+import { StatePartyInitial } from "./types";
 
 export function getFederalPartyOrder(
   congress: number,
