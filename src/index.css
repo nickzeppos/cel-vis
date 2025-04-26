@@ -172,6 +172,28 @@ button:focus-visible {
   }
 }
 
+@layer utilities {
+  /* Ensure table components can use flex layout for scrolling */
+  .ui-table-container {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .ui-table-scroll {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: auto;
+  }
+  
+  /* Ensure the whole app takes a reasonable height */
+  #root {
+    height: 100vh;
+    max-height: 100vh;
+    overflow: hidden;
+  }
+}
+
 @layer base {
   #root {
     /* Reset inherited WordPress typography that breaks rem math */

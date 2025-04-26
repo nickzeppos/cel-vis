@@ -27,7 +27,7 @@ export function BaseTableView({
               "grid gap-4 sm:gap-6",
 
               // Mobile layout
-              "grid-cols-1 grid-rows-[min-content_min-content_min-content] grid-areas-mobile",
+              "grid-cols-1 grid-rows-[min-content_1fr_min-content] grid-areas-mobile",
 
               // Desktop layout (md+)
               "md:grid-cols-[minmax(328px,1fr)_minmax(600px,2fr)] md:grid-rows-[min-content_1fr] md:grid-areas-desktop"
@@ -36,11 +36,13 @@ export function BaseTableView({
             {/* Control Panel */}
             <div className="grid-in-a space-y-4">
               {levelToggle}
-              <div className="min-h-[400px]">{controlPanel}</div>
+              <div className="md:h-[calc(100%-56px)]">{controlPanel}</div>
             </div>
 
-            {/* Main Content */}
-            <div className="grid-in-b space-y-4 min-h-[600px]">{table}</div>
+            {/* Main Content - Table */}
+            <div className="grid-in-b space-y-4 flex flex-col h-full md:max-h-[700px]">
+              {table}
+            </div>
 
             {/* Glossary */}
             <div className="grid-in-c space-y-4">{glossary}</div>
