@@ -6,15 +6,15 @@ import { expectationsColors } from "@/lib/colors";
 const terms = [
   [
     "SLES",
-    "A summary measure that captures how successful a member of the Upper or Lower legislative chamber is at moving her agenda items. The average SLES is 1.0.",
+    "A summary measure that captures how successful a member of the Upper or Lower legislative chamber is at moving her sponsored bills through the legislative process. The average SLES is 1.0 in each chamber in each legislative term.",
   ],
   [
     "Party Rank",
-    "The ranking of a member's SLES in comparison to all other members of her political party in the Upper or Lower legislative chamber.",
+    "The ranking of a legislator’s SLES in comparison to all other members of her political party in the Upper or Lower legislative chamber in each legislative term.",
   ],
   [
     "Benchmark",
-    "The expected SLES of a member of the Upper or Lower legislative chamber given her party, tenure, and committee assignments.",
+    "The expected SLES of a member of the Upper or Lower legislative chamber given her party affiliation, seniority, and whether or not she held a committee chair in the legislative term in which she served.",
   ],
 ] as const;
 
@@ -52,7 +52,7 @@ export function StateTableGlossary() {
                 style={{ color: expectationsColors.below }}
               />
             </span>{" "}
-            her expected SLES in a given state legislature.
+            her expected SLES in a given state legislative term.
           </div>
         </div>
 
