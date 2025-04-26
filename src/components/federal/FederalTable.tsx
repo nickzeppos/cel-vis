@@ -89,13 +89,19 @@ export function FederalTable({
   }, [searchTerm]);
 
   const handleSort = (field: SortField) => {
-    if (selectedIssue !== "all" && field === "rank") return;
+    if (
+      (selectedIssue !== "all" && field === "rank") ||
+      (chamber !== "house" && field === "district")
+    )
+      return;
 
     if (sortField === field) {
       setSortDirection(sortDirection === "asc" ? "desc" : "asc");
     } else {
       setSortField(field);
-      setSortDirection(field === "score" ? "desc" : "asc");
+      // Default sort direction for each field
+      const defaultDir = field === "score" ? "desc" : "asc";
+      setSortDirection(defaultDir);
     }
   };
 
@@ -169,15 +175,38 @@ export function FederalTable({
       headers={[
         {
           name: "Name",
-          width: "w-[50%]",
+          width: "w-[25%]",
           sortField: "name",
           currentSort: sortField,
           direction: sortDirection,
           onSort: handleSort,
         },
         {
+          name: "Party", // Party is not sortable now
+          width: "w-[8%]",
+          // Removed sortField, currentSort, direction, onSort
+        },
+        {
+          name: "State",
+          width: "w-[8%]",
+          sortField: "state",
+          currentSort: sortField,
+          direction: sortDirection,
+          onSort: handleSort,
+        },
+        {
+          name: "District",
+          width: "w-[8%]",
+          sortField: "district",
+          currentSort: sortField,
+          direction: sortDirection,
+          onSort: handleSort,
+          disabled: chamber !== "house",
+          className: cn(chamber !== "house" && "opacity-50 cursor-not-allowed"),
+        },
+        {
           name: "Party Rank",
-          width: "w-[15%]",
+          width: "w-[12%]",
           sortField: "rank",
           currentSort: sortField,
           direction: sortDirection,
@@ -189,22 +218,26 @@ export function FederalTable({
         },
         {
           name: "Benchmark",
-          width: "w-[15%]",
+          width: "w-[12%]",
           className: cn(selectedIssue !== "all" && "opacity-50"),
         },
         {
           name: "LES",
-          width: "w-[20%]",
+          width: "w-[15%]",
           sortField: "score",
           currentSort: sortField,
           direction: sortDirection,
           onSort: handleSort,
         },
+        {
+          name: "", // For chevron
+          width: "w-[5%]",
+        },
       ]}
       TableRowComponent={({ row }) =>
         row.type === "group" ? (
           <tr>
-            <td colSpan={4} className="px-4 py-2 font-bold bg-muted">
+            <td colSpan={8} className="px-4 py-2 font-bold bg-muted">
               {partyNames[row.party] ?? row.party}
             </td>
           </tr>

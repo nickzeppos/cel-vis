@@ -50,7 +50,7 @@ export function StateTableTitle({
       <div className="flex flex-wrap gap-4 text-sm text-muted-foreground items-center mt-1">
         <span className="flex items-center gap-1">
           <Users className="h-4 w-4" />
-          {numLegislators} legislators
+          {numLegislators} Legislators
         </span>
         <div className="flex gap-1 items-center">
           {orderedParties.map((party) =>

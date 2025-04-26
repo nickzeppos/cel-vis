@@ -67,6 +67,21 @@ export function getFederalTableRows({
         ? a.name.localeCompare(b.name)
         : b.name.localeCompare(a.name)
     );
+  } else if (sortField === "state") {
+    sorted = [...filtered].sort((a, b) =>
+      sortDirection === "asc"
+        ? a.state.localeCompare(b.state)
+        : b.state.localeCompare(a.state)
+    );
+  } else if (sortField === "district" && chamber === "house") {
+    sorted = [...filtered].sort((a, b) => {
+      const districtA = a.district ? a.district : 0;
+      const districtB = b.district ? b.district : 0;
+
+      return sortDirection === "asc"
+        ? districtA - districtB
+        : districtB - districtA;
+    });
   } else if (sortField === "rank" && selectedIssue === "all") {
     sorted =
       sortDirection === "asc"
@@ -157,6 +172,14 @@ export function getStateTableRows({
       sortDirection === "asc"
         ? sortAscending(filtered, (l) => l.sles)
         : sortDescending(filtered, (l) => l.sles);
+  } // In getStateTableRows function - add this case
+  else if (sortField === "district") {
+    sorted = [...filtered].sort((a, b) => {
+      // Direct number comparison for district sorting
+      return sortDirection === "asc"
+        ? a.district - b.district
+        : b.district - a.district;
+    });
   } else {
     sorted = filtered;
   }

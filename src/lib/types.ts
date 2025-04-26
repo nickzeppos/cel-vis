@@ -56,7 +56,13 @@ export const congressionalDistrictValidator = z.object({
   district: z.number(),
 });
 
-export type SortField = "name" | "rank" | "score";
+export type SortField =
+  | "name"
+  | "rank"
+  | "score"
+  | "state"
+  | "party"
+  | "district";
 export type SortDirection = "asc" | "desc";
 
 export type ChamberParties = {

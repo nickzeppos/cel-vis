@@ -121,15 +121,27 @@ export function StateTable({
       emptyState={
         isLoading
           ? "Loading data..."
-          : selectedState
+          : !selectedState
           ? "Select a state to view data."
           : error ?? "No data available."
       }
       headers={[
         {
           name: "Name",
-          width: "w-[50%]",
+          width: "w-[35%]",
           sortField: "name",
+          currentSort: sortField,
+          direction: sortDirection,
+          onSort: handleSort,
+        },
+        {
+          name: "Party", // Party is not sortable
+          width: "w-[8%]",
+        },
+        {
+          name: "District",
+          width: "w-[12%]",
+          sortField: "district", // Add this sort field
           currentSort: sortField,
           direction: sortDirection,
           onSort: handleSort,
@@ -144,21 +156,25 @@ export function StateTable({
         },
         {
           name: "Benchmark",
-          width: "w-[15%]",
+          width: "w-[10%]",
         },
         {
           name: "SLES",
-          width: "w-[20%]",
+          width: "w-[15%]",
           sortField: "score",
           currentSort: sortField,
           direction: sortDirection,
           onSort: handleSort,
         },
+        {
+          name: "", // For chevron
+          width: "w-[5%]",
+        },
       ]}
       TableRowComponent={({ row }) =>
         row.type === "group" ? (
           <tr>
-            <td colSpan={4} className="px-4 py-2 font-bold bg-muted">
+            <td colSpan={7} className="px-4 py-2 font-bold bg-muted">
               {partyNames[row.party] ?? row.party}
             </td>
           </tr>
