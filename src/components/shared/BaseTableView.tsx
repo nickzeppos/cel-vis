@@ -32,6 +32,7 @@ export function BaseTableView({
               // Desktop layout (md+)
               "md:grid-cols-[minmax(328px,1fr)_minmax(600px,2fr)] md:grid-rows-[min-content_1fr] md:grid-areas-desktop"
             )}
+            style={{ maxHeight: "800px" }} // Added to use more vertical space
           >
             {/* Control Panel */}
             <div className="grid-in-a space-y-4">
@@ -40,7 +41,7 @@ export function BaseTableView({
             </div>
 
             {/* Main Content - Table */}
-            <div className="grid-in-b space-y-4 flex flex-col h-full md:max-h-[700px]">
+            <div className="grid-in-b space-y-4 flex flex-col h-full">
               {table}
             </div>
 
