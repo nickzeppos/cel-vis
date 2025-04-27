@@ -16,6 +16,9 @@ type PerformanceData = {
   benchmark: number;
 };
 
+// Display mode for scores
+type ScoreDisplayMode = "absolute" | "normalized";
+
 // Common calculations needed by both PerformanceBar and PerformanceBarLabels
 interface CalculatedBarData {
   exceedsY: number;
@@ -38,11 +41,22 @@ function calculateBarData(
   x: number,
   y: number,
   width: number,
-  height: number
+  height: number,
+  displayMode: ScoreDisplayMode
 ): CalculatedBarData {
+  // Normalize values if in normalized mode
+  let normalizedScore = score;
+  let normalizedBenchmark = benchmark;
+  
+  if (displayMode === "normalized") {
+    // In normalized mode, benchmark becomes 1.0, and score is relative to benchmark
+    normalizedScore = score / benchmark;
+    normalizedBenchmark = 1.0;
+  }
+  
   // Derive exceeds and below thresholds from benchmark
-  const exceeds = benchmark * 1.5;
-  const below = benchmark * 0.5;
+  const exceeds = normalizedBenchmark * 1.5;
+  const below = normalizedBenchmark * 0.5;
 
   // Map values to Y positions (invert because SVG Y increases downward)
   const getYPosition = (value: number) => {
@@ -63,14 +77,14 @@ function calculateBarData(
 
   // Calculate positions
   const exceedsY = getYPosition(exceeds);
-  const benchmarkY = getYPosition(benchmark);
+  const benchmarkY = getYPosition(normalizedBenchmark);
   const belowY = getYPosition(below);
-  const scoreY = getYPosition(score);
+  const scoreY = getYPosition(normalizedScore);
 
   // Calculate the expectation based on score relative to thresholds
   let expectation: Expectation;
-  if (score >= exceeds) expectation = Expectation.EXCEEDS;
-  else if (score >= below) expectation = Expectation.MEETS;
+  if (normalizedScore >= exceeds) expectation = Expectation.EXCEEDS;
+  else if (normalizedScore >= below) expectation = Expectation.MEETS;
   else expectation = Expectation.BELOW;
 
   // Center the plot horizontally in the SVG
@@ -97,14 +111,12 @@ function PerformanceBarLabels({
   score,
   benchmark,
   barData,
-  x,
-  y,
-  width,
-  height,
+  displayMode,
 }: {
   score: number;
   benchmark: number;
   barData: CalculatedBarData;
+  displayMode: ScoreDisplayMode;
   x?: number;
   y?: number;
   width?: number;
@@ -126,6 +138,19 @@ function PerformanceBarLabels({
   const formatValue = (value: number) => {
     return value.toFixed(3);
   };
+  
+  // Get the display values based on mode
+  const getDisplayValue = (value: number) => {
+    if (displayMode === "absolute") {
+      return formatValue(value);
+    } else {
+      // For normalized mode, show as percentage relative to benchmark
+      return `${(value * 100).toFixed(1)}%`;
+    }
+  };
+  
+  // Get the actual score to display
+  const displayScore = displayMode === "absolute" ? score : score / benchmark;
 
   const labelRightOffset = 20; // Increased offset to make space for connectors
 
@@ -169,10 +194,10 @@ function PerformanceBarLabels({
   );
 
   // Calculate text widths (approximate)
-  const scoreTextWidth = formatValue(score).length * 6;
-  const exceedsTextWidth = `Exceeds (${formatValue(exceeds)})`.length * 6;
-  const benchmarkTextWidth = `Benchmark (${formatValue(benchmark)})`.length * 6;
-  const belowTextWidth = `Below (${formatValue(below)})`.length * 6;
+  const scoreTextWidth = getDisplayValue(displayScore).length * 6;
+  const exceedsTextWidth = `Exceeds (${getDisplayValue(exceeds)})`.length * 6;
+  const benchmarkTextWidth = `Benchmark (${getDisplayValue(displayMode === "absolute" ? benchmark : 1.0)})`.length * 6;
+  const belowTextWidth = `Below (${getDisplayValue(below)})`.length * 6;
 
   return (
     <g style={{ pointerEvents: "none" }}>
@@ -195,7 +220,7 @@ function PerformanceBarLabels({
           fill="#444"
           textAnchor="end"
         >
-          {formatValue(score)}
+          {getDisplayValue(displayScore)}
         </text>
 
         {/* Connector line from score marker to label */}
@@ -229,7 +254,7 @@ function PerformanceBarLabels({
           fontSize="10"
           fill="#16a34a"
         >
-          Exceeds ({formatValue(exceeds)})
+          Exceeds ({getDisplayValue(exceeds)})
         </text>
 
         {/* Connector line from exceeds bar to label */}
@@ -265,7 +290,7 @@ function PerformanceBarLabels({
           fontSize="10"
           fill="#2563eb"
         >
-          Benchmark ({formatValue(benchmark)})
+          Benchmark ({getDisplayValue(displayMode === "absolute" ? benchmark : 1.0)})
         </text>
 
         {/* Connector line from benchmark bar to label */}
@@ -301,7 +326,7 @@ function PerformanceBarLabels({
           fontSize="10"
           fill="#dc2626"
         >
-          Below ({formatValue(below)})
+          Below ({getDisplayValue(below)})
         </text>
 
         {/* Connector line from below bar to label */}
@@ -326,6 +351,7 @@ function PerformanceView({ bioguideID, congress }: Props) {
   const [data, setData] = useState<PerformanceData[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+  const [displayMode, setDisplayMode] = useState<ScoreDisplayMode>("absolute");
 
   // TODO: single endpoint to get all this data
   const getPerformanceData = useCallback(
@@ -367,19 +393,41 @@ function PerformanceView({ bioguideID, congress }: Props) {
   const globalRange = useMemo(() => {
     if (data.length === 0) return [0, 1] as [number, number];
 
-    const allValues = data.flatMap((d) => {
-      const exceeds = d.benchmark * 1.5;
-      const below = d.benchmark * 0.5;
-      return [d.score, d.benchmark, exceeds, below];
-    });
+    // For normalized mode, we want to ensure we're showing a consistent range
+    // that includes 0.5 (below), 1.0 (benchmark), and 1.5 (exceeds)
+    if (displayMode === "normalized") {
+      // Get all normalized scores
+      const normalizedScores = data.map(d => d.score / d.benchmark);
+      
+      // Find min and max of normalized scores
+      const min = Math.min(...normalizedScores, 0.5); // Include below threshold
+      const max = Math.max(...normalizedScores, 1.5); // Include exceeds threshold
+      
+      // Add margin
+      const range = max - min;
+      const margin = range * 0.2;
+      
+      // Ensure we always include at least 0.5 to 1.5 range
+      return [
+        Math.max(0, Math.min(min - margin, 0.4)), // Never go below 0, try to include below threshold
+        Math.max(max + margin, 1.6) // Always include exceeds threshold with margin
+      ] as [number, number];
+    } else {
+      // Absolute mode - use actual values
+      const allValues = data.flatMap((d) => {
+        const exceeds = d.benchmark * 1.5;
+        const below = d.benchmark * 0.5;
+        return [d.score, d.benchmark, exceeds, below];
+      });
 
-    const min = Math.min(...allValues);
-    const max = Math.max(...allValues);
+      const min = Math.min(...allValues);
+      const max = Math.max(...allValues);
 
-    // Add 20% margin
-    const margin = (max - min) * 0.2;
-    return [Math.max(0, min - margin), max + margin] as [number, number];
-  }, [data]);
+      // Add 20% margin
+      const margin = (max - min) * 0.2;
+      return [Math.max(0, min - margin), max + margin] as [number, number];
+    }
+  }, [data, displayMode]);
 
   if (isLoading) {
     return <div>Loading data...</div>;
@@ -400,9 +448,22 @@ function PerformanceView({ bioguideID, congress }: Props) {
   // Get the hovered bar data if any
   const hoveredBarData = hoveredIndex !== null ? data[hoveredIndex] : null;
 
+  // Toggle between absolute and normalized mode
+  const toggleDisplayMode = () => {
+    setDisplayMode(displayMode === "absolute" ? "normalized" : "absolute");
+  };
+
   return (
     <div className="flex flex-col">
-      <div>{bioguideID}</div>
+      <div className="flex justify-between items-center mb-4">
+        <div>{bioguideID}</div>
+        <button
+          onClick={toggleDisplayMode}
+          className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300"
+        >
+          {displayMode === "absolute" ? "Show Normalized" : "Show Absolute"}
+        </button>
+      </div>
       <svg
         width={svgWidth}
         height={svgHeight}
@@ -422,7 +483,8 @@ function PerformanceView({ bioguideID, congress }: Props) {
               xPosition,
               0,
               barWidth,
-              barHeight
+              barHeight,
+              displayMode
             );
             
             // Set opacity based on hover state
@@ -432,8 +494,8 @@ function PerformanceView({ bioguideID, congress }: Props) {
             return (
               <g key={d.congress} opacity={opacity}>
                 <PerformanceBar
-                  score={d.score}
-                  benchmark={d.benchmark}
+                  score={displayMode === "absolute" ? d.score : d.score / d.benchmark}
+                  benchmark={displayMode === "absolute" ? d.benchmark : 1.0}
                   range={globalRange}
                   x={xPosition}
                   y={0}
@@ -465,6 +527,7 @@ function PerformanceView({ bioguideID, congress }: Props) {
           <PerformanceBarLabels
             score={hoveredBarData.score}
             benchmark={hoveredBarData.benchmark}
+            displayMode={displayMode}
             barData={calculateBarData(
               hoveredBarData.score,
               hoveredBarData.benchmark,
@@ -472,12 +535,9 @@ function PerformanceView({ bioguideID, congress }: Props) {
               leftMargin + hoveredIndex * (barWidth + spacing),
               0,
               barWidth,
-              barHeight
+              barHeight,
+              displayMode
             )}
-            x={leftMargin + hoveredIndex * (barWidth + spacing)}
-            y={0}
-            width={barWidth}
-            height={barHeight}
           />
         )}
       </svg>
