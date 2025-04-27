@@ -1,6 +1,6 @@
-import type { ReactNode } from "react";
-import { cn } from "@/lib/utils";
 import { container } from "@/lib/layout";
+import { cn } from "@/lib/utils";
+import type { ReactNode } from "react";
 
 interface BaseTableViewProps {
   levelToggle: ReactNode;
@@ -18,7 +18,7 @@ export function BaseTableView({
   className,
 }: BaseTableViewProps) {
   return (
-    <div className={cn("min-h-screen bg-background", className)}>
+    <div className={cn("bg-background", className)}>
       <div className="relative flex flex-col items-center px-4 py-8">
         <div className={cn("w-full", `max-w-[${container.maxWidth}px]`)}>
           <div
