@@ -9,6 +9,8 @@ import {
 import { cn } from "@/lib/utils";
 import { ColumnHeader } from "./ColumnHeader";
 import { SortDirection, SortField } from "@/lib/types";
+import { useTableState } from "@/context/TableStateContext";
+import { useRef, useLayoutEffect } from "react";
 
 interface BaseTableProps<T> {
   className?: string;
@@ -40,17 +42,24 @@ export function BaseTable<T>({
   type = "federal",
   TableTitleComponent: TableTitle,
 }: BaseTableProps<T>) {
+  const { updateHeight } = useTableState();
+  const dataRef = useRef<Array<any> | undefined>(undefined);
+  const tableRef = useRef<HTMLDivElement>(null);
+
+  // Use useLayoutEffect to update height after DOM rendering
+  useLayoutEffect(() => {
+    // If data changed or this is the first render with data
+    if (data !== dataRef.current && Array.isArray(data) && data.length > 0) {
+      updateHeight();
+      dataRef.current = data;
+    }
+  }, [data, updateHeight]);
+
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full" ref={tableRef}>
       <div className="flex items-center justify-between mb-4">{TableTitle}</div>
-      <div
-        className={cn(
-          "rounded-lg border bg-card flex-1 overflow-hidden flex flex-col",
-          className
-        )}
-      >
-        {/* Table container with scroll */}
-        <div className="flex-1 overflow-auto">
+      <div className={cn("rounded-lg border bg-card flex flex-col", className)}>
+        <div className="flex-1">
           <div className={cn("w-full", minWidth && `min-w-[${minWidth}]`)}>
             <Table>
               <TableHeader>

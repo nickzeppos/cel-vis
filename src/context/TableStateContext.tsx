@@ -1,4 +1,11 @@
-import React, { createContext, useContext, useState } from "react";
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 import type { FederalChamber } from "@/lib/types";
 import { VisTableResponse } from "@/services/api.types";
 
@@ -25,6 +32,8 @@ type TableStateContextType = {
   stateTableState: StateTableState;
   updateStateTableState: (state: Partial<StateTableState>) => void;
   resetStateTableState: () => void;
+  // In addition to data related context, we're going to use provider here to help track and send updates about the height of the app to the iframe
+  updateHeight: () => void;
 };
 
 const defaultFederalState: FederalTableState = {
@@ -58,21 +67,57 @@ export const TableStateProvider = ({
     defaultStateTableState
   );
 
+  // Track when DOM updates might affect height
+  const contentChanged = useRef(false);
+
+  // Function to update iframe height
+  const updateHeight = useCallback(() => {
+    const height = document.documentElement.scrollHeight;
+    console.log("[iframe] Sending height:", height);
+    if (window.parent) {
+      window.parent.postMessage({ type: "setHeight", height }, "*");
+    }
+  }, []);
+
+  // Then send height on every state change
   const updateFederalState = (newState: Partial<FederalTableState>) => {
+    contentChanged.current = true;
     setFederalState((current) => ({ ...current, ...newState }));
   };
 
   const resetFederalState = () => {
+    contentChanged.current = true;
     setFederalState(defaultFederalState);
   };
 
   const updateStateTableState = (newState: Partial<StateTableState>) => {
+    contentChanged.current = true;
     setStateTableState((current) => ({ ...current, ...newState }));
   };
 
   const resetStateTableState = () => {
+    contentChanged.current = true;
     setStateTableState(defaultStateTableState);
   };
+
+  // Use useLayoutEffect to measure height right after DOM mutations
+  useLayoutEffect(() => {
+    if (contentChanged.current) {
+      updateHeight();
+      contentChanged.current = false;
+    }
+  });
+
+  // Also set up a resize listener for window size changes
+  useLayoutEffect(() => {
+    window.addEventListener("resize", updateHeight);
+    return () => window.removeEventListener("resize", updateHeight);
+  }, [updateHeight]);
+
+  // Initial height measurement on mount
+  useLayoutEffect(() => {
+    updateHeight();
+  }, []);
 
   return (
     <TableStateContext.Provider
@@ -83,6 +128,7 @@ export const TableStateProvider = ({
         stateTableState,
         updateStateTableState,
         resetStateTableState,
+        updateHeight,
       }}
     >
       {children}

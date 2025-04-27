@@ -1,61 +1,71 @@
 import type { ViewRoute } from "@/lib/types";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import FederalTableView from "@/components/federal/FederalTableView";
 import { FederalScorecardView } from "@/components/federal/FederalScorecardView";
 import StateTableView from "./components/state/StateTableView";
 import { StateScorecardView } from "./components/state/StateScorecardView";
-import { TableStateProvider } from "./context/TableStateContext";
+import { TableStateProvider, useTableState } from "./context/TableStateContext";
 
 const defaultRoute = { type: "federal:table" } as ViewRoute;
-function App() {
-  const [route, setRoute] = useState<ViewRoute>(defaultRoute);
 
+// Create a router that handles height updates on route changes
+function AppRouter() {
+  const [route, setRoute] = useState<ViewRoute>(defaultRoute);
+  const { updateHeight } = useTableState();
+
+  // Handle route changes with height updates
+  const handleRouteChange = useCallback(
+    (newRoute: ViewRoute) => {
+      setRoute(newRoute);
+      // Use requestAnimationFrame to wait for render
+      requestAnimationFrame(() => {
+        updateHeight();
+      });
+    },
+    [updateHeight]
+  );
+
+  // Also update height when component first mounts
   useEffect(() => {
-    const sendHeightToParent = () => {
-      const height = document.documentElement.scrollHeight;
-      console.log("[iframe] Sending height:", height);
-      if (window.parent) {
-        window.parent.postMessage(
-          {
-            type: "setHeight",
-            height: height,
-          },
-          "*"
-        );
-      }
-    };
-    sendHeightToParent();
-    window.addEventListener("resize", sendHeightToParent); // listen for resizes
-    return () => {
-      window.removeEventListener("resize", sendHeightToParent);
-    };
-  }, []);
+    updateHeight();
+  }, [updateHeight]);
 
   return (
-    <TableStateProvider>
-      {/* switch render on route */}
+    <>
       {(() => {
         switch (route.type) {
           case "federal:table":
-            return <FederalTableView route={route} setRoute={setRoute} />;
+            return (
+              <FederalTableView route={route} setRoute={handleRouteChange} />
+            );
           case "federal:scorecard":
             return (
               <FederalScorecardView
                 legislator={route.legislator}
-                onBack={() => setRoute({ type: "federal:table" })}
+                onBack={() => handleRouteChange({ type: "federal:table" })}
               />
             );
           case "state:table":
-            return <StateTableView route={route} setRoute={setRoute} />;
+            return (
+              <StateTableView route={route} setRoute={handleRouteChange} />
+            );
           case "state:scorecard":
             return (
               <StateScorecardView
                 legislator={route.legislator}
-                onBack={() => setRoute({ type: "state:table" })}
+                onBack={() => handleRouteChange({ type: "state:table" })}
               />
             );
         }
       })()}
+    </>
+  );
+}
+
+function App() {
+  return (
+    <TableStateProvider>
+      <AppRouter />
     </TableStateProvider>
   );
 }
