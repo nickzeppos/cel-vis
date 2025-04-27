@@ -1,3 +1,5 @@
+import type { FederalChamber } from "@/lib/types";
+import { VisTableResponse } from "@/services/api.types";
 import React, {
   createContext,
   useCallback,
@@ -6,8 +8,6 @@ import React, {
   useRef,
   useState,
 } from "react";
-import type { FederalChamber } from "@/lib/types";
-import { VisTableResponse } from "@/services/api.types";
 
 type FederalTableState = {
   congress: string;
@@ -72,7 +72,7 @@ export const TableStateProvider = ({
 
   // Function to update iframe height
   const updateHeight = useCallback(() => {
-    const height = document.documentElement.scrollHeight;
+    const height = document.querySelector("body")?.scrollHeight ?? 400;
     console.log("[iframe] Sending height:", height);
     if (window.parent) {
       window.parent.postMessage({ type: "setHeight", height }, "*");
