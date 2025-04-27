@@ -1,5 +1,5 @@
 import { Expectation, getExpectationColor } from "@/lib/expectations";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 
 export default function PerformanceBar({
   score,
@@ -10,6 +10,9 @@ export default function PerformanceBar({
   benchmark: number;
   range?: [number, number];
 }) {
+  // State to track hover
+  const [isHovered, setIsHovered] = useState(false);
+
   // Derive exceeds and below thresholds from benchmark
   const exceeds = benchmark * 1.5;
   const below = benchmark * 0.5;
@@ -106,8 +109,20 @@ export default function PerformanceBar({
   // Label offset from the right edge of the plot
   const labelOffset = 5;
 
+  // CSS transitions for labels
+  const labelStyle = {
+    opacity: isHovered ? 1 : 0,
+    transition: isHovered 
+      ? "opacity 150ms ease-in" 
+      : "opacity 200ms ease-out"
+  };
+
   return (
-    <div className="relative flex items-center justify-center w-[100px] h-[300px]">
+    <div 
+      className="relative flex items-center justify-center w-[100px] h-[300px]"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
       <svg className="w-full h-full" viewBox="0 0 100 300">
         {/* Highlighted range */}
         <rect
@@ -181,6 +196,7 @@ export default function PerformanceBar({
           fontSize="10"
           fill="#444"
           textAnchor="end"
+          style={labelStyle}
         >
           {formatValue(score)}
         </text>
@@ -192,6 +208,7 @@ export default function PerformanceBar({
           fontSize="10"
           fill="#16a34a"
           textAnchor="start"
+          style={labelStyle}
         >
           {formatValue(exceeds)}
         </text>
@@ -203,6 +220,7 @@ export default function PerformanceBar({
           fontSize="10"
           fill="#2563eb"
           textAnchor="start"
+          style={labelStyle}
         >
           {formatValue(benchmark)}
         </text>
@@ -214,6 +232,7 @@ export default function PerformanceBar({
           fontSize="10"
           fill="#dc2626"
           textAnchor="start"
+          style={labelStyle}
         >
           {formatValue(below)}
         </text>

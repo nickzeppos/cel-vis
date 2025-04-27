@@ -7,12 +7,12 @@ import { StateScorecardView } from "./components/state/StateScorecardView";
 import StateTableView from "./components/state/StateTableView";
 import { TableStateProvider, useTableState } from "./context/TableStateContext";
 
-// const defaultRoute = { type: "federal:table" } as ViewRoute;
-const defaultRoute = {
-  type: "perf",
-  bioguideID: "P000197",
-  congress: 118,
-} as ViewRoute;
+const defaultRoute = { type: "federal:table" } as ViewRoute;
+// const defaultRoute = {
+//   type: "perf",
+//   bioguideID: "P000197",
+//   congress: 118,
+// } as ViewRoute;
 
 // Create a router that handles height updates on route changes
 function AppRouter() {
