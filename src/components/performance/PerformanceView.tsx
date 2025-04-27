@@ -64,7 +64,7 @@ function PerformanceView({ bioguideID, congress }: Props) {
   }
 
   return (
-    <div>
+    <div className="flex flex-row space-x-4">
       <div>{bioguideID}</div>
       {data.map((d) => (
         <PerformanceBar
