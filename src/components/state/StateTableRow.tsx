@@ -56,7 +56,7 @@ export function StateTableRow({ row, onClick }: StateTableRowProps) {
         <span style={{ color: expectationColor }}>{row.sles.toFixed(3)}</span>
         <ExpectationIcon
           expectation={expectation}
-          className="h-5 w-5 ml-2 inline-block"
+          className="h-4 w-4 ml-2 inline-block"
           style={{ color: expectationColor }}
         />
       </TableCell>

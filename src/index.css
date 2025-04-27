@@ -7,9 +7,9 @@
   line-height: 1.5;
   font-weight: 400;
 
-  color-scheme: light dark;
+  /* color-scheme: light dark;
   color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  background-color: #242424; */
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -179,20 +179,20 @@ button:focus-visible {
     display: flex;
     flex-direction: column;
   }
-  
-  .ui-table-scroll {
+}
+  /* .ui-table-scroll {
     flex: 1;
     overflow-y: auto;
     overflow-x: auto;
-  }
+  } */
   
   /* Ensure the whole app takes a reasonable height */
-  #root {
+  /* #root {
     height: 100vh;
     max-height: 100vh;
     overflow: hidden;
   }
-}
+} */
 
 @layer base {
   #root {
