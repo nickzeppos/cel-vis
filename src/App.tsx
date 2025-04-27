@@ -1,12 +1,18 @@
-import type { ViewRoute } from "@/lib/types";
-import { useState, useEffect, useCallback } from "react";
-import FederalTableView from "@/components/federal/FederalTableView";
 import { FederalScorecardView } from "@/components/federal/FederalScorecardView";
-import StateTableView from "./components/state/StateTableView";
+import FederalTableView from "@/components/federal/FederalTableView";
+import type { ViewRoute } from "@/lib/types";
+import { useCallback, useEffect, useState } from "react";
+import PerformanceView from "./components/performance/PerformanceView";
 import { StateScorecardView } from "./components/state/StateScorecardView";
+import StateTableView from "./components/state/StateTableView";
 import { TableStateProvider, useTableState } from "./context/TableStateContext";
 
 const defaultRoute = { type: "federal:table" } as ViewRoute;
+// const defaultRoute = {
+//   type: "perf",
+//   bioguideID: "P000197",
+//   congress: 118,
+// } as ViewRoute;
 
 // Create a router that handles height updates on route changes
 function AppRouter() {
@@ -54,6 +60,13 @@ function AppRouter() {
               <StateScorecardView
                 legislator={route.legislator}
                 onBack={() => handleRouteChange({ type: "state:table" })}
+              />
+            );
+          case "perf":
+            return (
+              <PerformanceView
+                bioguideID={route.bioguideID}
+                congress={route.congress}
               />
             );
         }
