@@ -30,7 +30,6 @@ body {
   margin: 0;
   display: flex;
   min-width: 320px;
-  min-height: 100vh;
 }
 
 h1 {
@@ -93,7 +92,7 @@ button:focus-visible {
     --ring: 15 84% 53%;
     --radius: 0.5rem;
   }
- 
+
   .dark {
     --background: 0 0% 3.9%;
     --foreground: 0 0% 98%;
@@ -172,8 +171,6 @@ button:focus-visible {
   }
 }
 
-
-
 @layer base {
   #root {
     /* Reset inherited WordPress typography that breaks rem math */
@@ -183,8 +180,9 @@ button:focus-visible {
     box-sizing: border-box;
   }
 
-  #root *, #root *::before, #root *::after {
+  #root *,
+  #root *::before,
+  #root *::after {
     box-sizing: inherit;
   }
-
 }
