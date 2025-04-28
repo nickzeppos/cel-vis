@@ -93,10 +93,10 @@ export function Map({
   return (
     <div className="w-full flex justify-center">
       <div
-        className="grid gap-2"
+        className="grid gap-1 sm:gap-2"
         style={{
-          gridTemplateColumns: `repeat(${maxCols}, 20px)`,
-          gridTemplateRows: `repeat(${maxRows}, 20px)`,
+          gridTemplateColumns: `repeat(${maxCols}, minmax(16px, 20px))`,
+          gridTemplateRows: `repeat(${maxRows}, minmax(16px, 20px))`,
         }}
       >
         {stateGrid.map((row, rowIndex) =>
@@ -116,7 +116,7 @@ export function Map({
                         }
                       }}
                       className={cn(
-                        "w-5 h-5 text-[9px] font-medium transition-colors",
+                        "w-4 h-4 sm:w-5 sm:h-5 text-[8px] sm:text-[9px] font-medium transition-colors",
                         "rounded flex items-center justify-center",
                         "focus:outline-none focus-visible:outline-none",
                         "border-none appearance-none",
