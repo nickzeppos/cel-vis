@@ -9,7 +9,7 @@ import type {
   SortField,
 } from "@/lib/types";
 import { cn } from "@/lib/utils";
-import { getDistrictForZip, getTableData } from "@/services/api";
+import { getTableData } from "@/services/api";
 import type { CongressionalDistrict, VisTable } from "@/services/api.types";
 import { useEffect, useMemo, useState } from "react";
 import { FederalTableTitle } from "./FederalTableTitle";
@@ -66,26 +66,9 @@ export function FederalTable({
   }, [congress]);
 
   useEffect(() => {
-    const lookupZip = async () => {
-      if (!searchTerm) {
-        setDistrictFromZip(null);
-        return;
-      }
-
-      if (/^\d{5}$/.test(searchTerm)) {
-        try {
-          const district = await getDistrictForZip(searchTerm);
-          setDistrictFromZip(district || null);
-        } catch (err) {
-          console.error("Failed to look up ZIP code:", err);
-          setDistrictFromZip(null);
-        }
-      } else {
-        setDistrictFromZip(null);
-      }
-    };
-
-    lookupZip();
+    // Zip code search functionality has been disabled
+    // Always set districtFromZip to null regardless of search term
+    setDistrictFromZip(null);
   }, [searchTerm]);
 
   const handleSort = (field: SortField) => {

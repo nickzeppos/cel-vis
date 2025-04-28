@@ -121,8 +121,9 @@ export function StateScorecardView({
   return (
     <div className="space-y-6">
       <BackButton onClick={onBack} />
-      <div className="grid grid-cols-[2fr,3fr] gap-6">
-        <div className="space-y-6">
+      <div className="grid grid-areas-scorecard-mobile md:grid-areas-scorecard gap-6">
+        {/* Legislator Info and Term Selection - Left column on desktop, top on mobile */}
+        <div className="space-y-6 grid-in-scorecard-info">
           <Card className="shadow-none border-0">
             <CardHeader className="pb-2">
               <div className="space-y-1">
@@ -211,17 +212,21 @@ export function StateScorecardView({
               </div>
             </CardContent>
           </Card>
-
-          <StateScorecardGlossary />
         </div>
 
+        {/* Score Matrix - Right column on desktop, middle on mobile */}
         {scorecard?.data?.overall && (
-          <Card className="shadow-none border-0">
+          <Card className="shadow-none border-0 grid-in-scorecard-matrix">
             <CardContent className="pt-6">
               <ScoreMatrix matrix={scorecard.data.overall} />
             </CardContent>
           </Card>
         )}
+
+        {/* Glossary - Bottom on both desktop and mobile */}
+        <div className="grid-in-scorecard-glossary">
+          <StateScorecardGlossary />
+        </div>
       </div>
     </div>
   );

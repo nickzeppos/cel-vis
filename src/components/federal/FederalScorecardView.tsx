@@ -11,6 +11,7 @@ import { ScoreButton } from "@/components/shared/ScoreButton";
 import { ScoreMatrix } from "@/components/shared/ScoreMatrix";
 import { CongressSelector } from "@/components/federal/CongressSelector";
 import { FederalScorecardGlossary } from "@/components/federal/FederalScorecardGlossary";
+import { IssueCarousel } from "@/components/federal/IssueCarousel";
 
 interface FederalScorecardProps {
   legislator: VisTable;
@@ -121,8 +122,9 @@ export function FederalScorecardView({
   return (
     <div className="space-y-6">
       <BackButton onClick={onBack} />
-      <div className="grid grid-cols-[2fr,3fr] gap-6">
-        <div className="space-y-6">
+      <div className="grid grid-areas-scorecard-mobile md:grid-areas-scorecard gap-6">
+        {/* Legislator Info and Issue Selection - Left column on desktop, top on mobile */}
+        <div className="space-y-6 grid-in-scorecard-info">
           <Card className="shadow-none border-0">
             <CardHeader className="pb-2">
               <div className="space-y-1">
@@ -156,20 +158,19 @@ export function FederalScorecardView({
 
                 <div className="flex-1 min-h-0 mt-6">
                   <h3 className="font-semibold px-4 mb-2">Issues</h3>
+                  {/* Desktop view - vertical scrolling */}
                   <div
                     ref={issueListRef}
-                    className="space-y-2 overflow-y-auto pr-2"
+                    className="hidden md:block space-y-2 overflow-y-auto pr-2"
                     style={{
-                      maxHeight: matrixHeight
-                        ? `${matrixHeight - 180}px`
-                        : undefined,
+                      maxHeight: matrixHeight ? `${matrixHeight - 180}px` : undefined,
                       paddingTop: "8px",
                       paddingBottom: "8px",
                     }}
                   >
                     {Object.entries(legislator.iles).map(([issue, score]) => (
                       <ScoreButton
-                        key={issue}
+                        key={`desktop-${issue}`}
                         title={getIssueDisplayName(issue)}
                         score={score}
                         isSelected={selectedIssue === issue}
@@ -178,21 +179,36 @@ export function FederalScorecardView({
                       />
                     ))}
                   </div>
+                  
+                  {/* Mobile view - horizontal scrolling with square buttons */}
+                  <div className="md:hidden">
+                    <div className="grid grid-cols-1 max-w-full">
+                      <IssueCarousel
+                        issues={legislator.iles}
+                        selectedIssue={selectedIssue}
+                        onIssueSelect={setSelectedIssue}
+                      />
+                    </div>
+                  </div>
                 </div>
               </div>
             </CardContent>
           </Card>
-
-          <FederalScorecardGlossary />
         </div>
 
+        {/* Score Matrix - Right column on desktop, middle on mobile */}
         {scorecard && matrix && (
-          <Card className="shadow-none border-0">
-            <CardContent className="pt-6" ref={matrixRef}>
+          <Card className="shadow-none border-0 grid-in-scorecard-matrix">
+            <CardContent className="md:pt-6 pt-3" ref={matrixRef}>
               <ScoreMatrix matrix={matrix} />
             </CardContent>
           </Card>
         )}
+
+        {/* Glossary - Bottom on both desktop and mobile */}
+        <div className="grid-in-scorecard-glossary">
+          <FederalScorecardGlossary />
+        </div>
       </div>
     </div>
   );

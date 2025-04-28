@@ -93,7 +93,7 @@ export function FederalControlPanel({
           <div className="space-y-6">
             <div className="space-y-4">
               <div className="space-y-2">
-                <label className="font-medium text-gray-700">CONGRESS</label>
+                <label className="text-sm font-medium text-gray-700">CONGRESS</label>
                 <Select
                   value={congress}
                   onValueChange={onCongressChange}
@@ -125,7 +125,7 @@ export function FederalControlPanel({
               />
 
               <div className="space-y-2">
-                <label className="font-medium text-gray-700">ISSUE</label>
+                <label className="text-sm font-medium text-gray-700">ISSUE</label>
                 <Select value={selectedIssue} onValueChange={onIssueChange}>
                   <SelectTrigger>
                     <SelectValue placeholder="Select issue">
@@ -171,12 +171,14 @@ export function FederalControlPanel({
                     Search
                   </ToggleGroupItem>
                 </ToggleGroup>
-                <div className="h-[40px]">
+                <div className="space-y-2">
                   {filterMode === "state" ? (
-                    <Select
-                      value={selectedState}
-                      onValueChange={handleStateSelect}
-                    >
+                    <>
+                      <label className="text-sm font-medium text-gray-700">STATE</label>
+                      <Select
+                        value={selectedState}
+                        onValueChange={handleStateSelect}
+                      >
                       <SelectTrigger>
                         <SelectValue placeholder="Select state">
                           {selectedState === "all"
@@ -195,12 +197,16 @@ export function FederalControlPanel({
                           ))}
                       </SelectContent>
                     </Select>
+                    </>
                   ) : (
-                    <SearchInput
-                      value={searchInputValue}
-                      onChange={handleSearchChange}
-                      placeholder="Search by name or zip"
-                    />
+                    <>
+                      <label className="text-sm font-medium text-gray-700">SEARCH</label>
+                      <SearchInput
+                        value={searchInputValue}
+                        onChange={handleSearchChange}
+                        placeholder="Search by name"
+                      />
+                    </>
                   )}
                 </div>
 

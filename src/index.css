@@ -158,6 +158,22 @@ button:focus-visible {
       "c b";
   }
 
+  /* Scorecard layouts */
+  .grid-areas-scorecard-mobile {
+    grid-template-areas:
+      "scorecard-info"
+      "scorecard-matrix"
+      "scorecard-glossary";
+    grid-template-columns: 1fr;
+  }
+
+  .grid-areas-scorecard {
+    grid-template-areas:
+      "scorecard-info scorecard-matrix"
+      "scorecard-glossary scorecard-matrix";
+    grid-template-columns: 2fr 3fr;
+  }
+
   .grid-in-a {
     grid-area: a;
   }
@@ -168,6 +184,18 @@ button:focus-visible {
 
   .grid-in-c {
     grid-area: c;
+  }
+
+  .grid-in-scorecard-info {
+    grid-area: scorecard-info;
+  }
+
+  .grid-in-scorecard-matrix {
+    grid-area: scorecard-matrix;
+  }
+
+  .grid-in-scorecard-glossary {
+    grid-area: scorecard-glossary;
   }
 }
 
@@ -200,4 +228,14 @@ button:focus-visible {
   width: 100%;
   min-width: 100%;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Hide scrollbars but keep scrolling functionality */
+.scrollbar-hide {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
 }
