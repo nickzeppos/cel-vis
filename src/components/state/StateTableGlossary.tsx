@@ -52,7 +52,7 @@ export function StateTableGlossary() {
                 style={{ color: expectationsColors.below }}
               />
             </span>{" "}
-            her expected SLES in a given state legislative term.
+            her expected SLES in a given state legislature, in a given legislative term.
           </div>
         </div>
 
