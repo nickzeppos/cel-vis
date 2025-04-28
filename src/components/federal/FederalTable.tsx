@@ -180,6 +180,7 @@ export function FederalTable({
           currentSort: sortField,
           direction: sortDirection,
           onSort: handleSort,
+          className: "sticky left-0 bg-card/95 z-10 border-r border-border/80 after:absolute after:right-0 after:top-0 after:h-full after:w-[1px] after:shadow-[0_0_8px_rgba(0,0,0,0.1)]",
         },
         {
           name: "Party", // Party is not sortable now
@@ -236,10 +237,11 @@ export function FederalTable({
       ]}
       TableRowComponent={({ row }) =>
         row.type === "group" ? (
-          <tr>
-            <td colSpan={8} className="px-4 py-2 font-bold bg-muted">
+          <tr className="group-row">
+            <td className="px-4 py-2 font-bold bg-muted sticky left-0 z-10 border-r border-border/80 after:absolute after:right-0 after:top-0 after:h-full after:w-[1px] after:shadow-[0_0_8px_rgba(0,0,0,0.1)]">
               {partyNames[row.party] ?? row.party}
             </td>
+            <td colSpan={7} className="p-0 bg-muted"></td>
           </tr>
         ) : (
           <FederalTableRow

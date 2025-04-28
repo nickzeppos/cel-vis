@@ -186,3 +186,18 @@ button:focus-visible {
     box-sizing: inherit;
   }
 }
+
+/* Table styles for sticky elements */
+.sticky-party-row {
+  position: relative;
+  z-index: 5;
+}
+
+.sticky-party-row td {
+  position: sticky;
+  left: 0;
+  right: 0;
+  width: 100%;
+  min-width: 100%;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}

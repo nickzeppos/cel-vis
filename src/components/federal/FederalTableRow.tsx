@@ -40,7 +40,7 @@ export function FederalTableRow({
       className="relative cursor-pointer group hover:bg-muted/40"
     >
       {/* Name */}
-      <TableCell className="pl-4 w-[25%]">
+      <TableCell className="pl-4 w-[25%] sticky left-0 bg-card/95 z-10 border-r border-border/80 after:absolute after:right-0 after:top-0 after:h-full after:w-[1px] after:shadow-[0_0_8px_rgba(0,0,0,0.1)]">
         <div className="font-medium">{row.name}</div>
       </TableCell>
 
@@ -86,19 +86,21 @@ export function FederalTableRow({
 
       {/* LES + Expectation */}
       <TableCell className="pl-4 font-mono w-[15%]">
-        <span
-          style={showExpectation ? { color: expectationColor } : undefined}
-          className={cn(isZeroScore && "opacity-50")}
-        >
-          {score.toFixed(3)}
-        </span>
-        {showExpectation && expectation && (
-          <ExpectationIcon
-            expectation={expectation}
-            className="h-4 w-4 ml-2 inline-block"
-            style={{ color: expectationColor }}
-          />
-        )}
+        <div className="flex items-center whitespace-nowrap">
+          <span
+            style={showExpectation ? { color: expectationColor } : undefined}
+            className={cn(isZeroScore && "opacity-50")}
+          >
+            {score.toFixed(3)}
+          </span>
+          {showExpectation && expectation && (
+            <ExpectationIcon
+              expectation={expectation}
+              className="h-4 w-4 ml-2 flex-shrink-0"
+              style={{ color: expectationColor }}
+            />
+          )}
+        </div>
       </TableCell>
 
       {/* Chevron */}

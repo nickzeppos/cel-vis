@@ -22,7 +22,7 @@ export function StateTableRow({ row, onClick }: StateTableRowProps) {
       className="relative cursor-pointer group hover:bg-muted/40"
     >
       {/* Name */}
-      <TableCell className="w-[35%] pl-4">
+      <TableCell className="w-[35%] pl-4 sticky left-0 bg-card/95 z-10 border-r border-border/80 after:absolute after:right-0 after:top-0 after:h-full after:w-[1px] after:shadow-[0_0_8px_rgba(0,0,0,0.1)]">
         <div className="font-medium">{row.name}</div>
       </TableCell>
 
@@ -53,12 +53,14 @@ export function StateTableRow({ row, onClick }: StateTableRowProps) {
 
       {/* SLES + Expectation */}
       <TableCell className="w-[15%] pl-4 font-mono">
-        <span style={{ color: expectationColor }}>{row.sles.toFixed(3)}</span>
-        <ExpectationIcon
-          expectation={expectation}
-          className="h-4 w-4 ml-2 inline-block"
-          style={{ color: expectationColor }}
-        />
+        <div className="flex items-center whitespace-nowrap">
+          <span style={{ color: expectationColor }}>{row.sles.toFixed(3)}</span>
+          <ExpectationIcon
+            expectation={expectation}
+            className="h-4 w-4 ml-2 flex-shrink-0"
+            style={{ color: expectationColor }}
+          />
+        </div>
       </TableCell>
 
       {/* Chevron */}
