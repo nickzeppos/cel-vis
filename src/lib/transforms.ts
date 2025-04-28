@@ -68,11 +68,22 @@ export function getFederalTableRows({
         : b.name.localeCompare(a.name)
     );
   } else if (sortField === "state") {
-    sorted = [...filtered].sort((a, b) =>
-      sortDirection === "asc"
+    sorted = [...filtered].sort((a, b) => {
+      // First compare by state based on the selected sort direction
+      const stateComparison = sortDirection === "asc"
         ? a.state.localeCompare(b.state)
-        : b.state.localeCompare(a.state)
-    );
+        : b.state.localeCompare(a.state);
+      
+      // If states are the same, always sort by district in ascending order
+      if (stateComparison === 0 && chamber === "house") {
+        // Convert district to number for comparison
+        const districtA = a.district ? parseInt(a.district.toString()) : 0;
+        const districtB = b.district ? parseInt(b.district.toString()) : 0;
+        return districtA - districtB; // Always ascending
+      }
+      
+      return stateComparison;
+    });
   } else if (sortField === "district" && chamber === "house") {
     sorted = [...filtered].sort((a, b) => {
       const districtA = a.district ? a.district : 0;

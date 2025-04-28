@@ -181,10 +181,7 @@ export function FederalTable({
         {
           name: "District",
           width: "w-[8%]",
-          sortField: "district",
-          currentSort: sortField,
-          direction: sortDirection,
-          onSort: handleSort,
+          // District is no longer sortable
           disabled: chamber !== "house",
           className: cn(chamber !== "house" && "opacity-50 cursor-not-allowed"),
         },
