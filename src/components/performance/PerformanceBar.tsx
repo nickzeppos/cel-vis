@@ -37,7 +37,7 @@ export default function PerformanceBar({
   scoreY,
   expectation,
   // Hover state
-  isHovered = false,
+  // isHovered = false,
   onHover,
 }: PerformanceBarProps) {
   // Derive exceeds and below thresholds from benchmark
