@@ -168,7 +168,6 @@ export function FederalTable({
         {
           name: "Party", // Party is not sortable now
           width: "w-[8%]",
-          // Removed sortField, currentSort, direction, onSort
         },
         {
           name: "State",

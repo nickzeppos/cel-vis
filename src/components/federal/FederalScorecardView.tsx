@@ -12,43 +12,63 @@ import { ScoreMatrix } from "@/components/shared/ScoreMatrix";
 import { CongressSelector } from "@/components/federal/CongressSelector";
 import { FederalScorecardGlossary } from "@/components/federal/FederalScorecardGlossary";
 import { IssueCarousel } from "@/components/federal/IssueCarousel";
+import { useNavigate, useParams } from "react-router-dom";
 
-interface FederalScorecardProps {
-  legislator: VisTable;
-  onBack: () => void;
-}
-
-export function FederalScorecardView({
-  legislator: initialLegislator,
-  onBack,
-}: FederalScorecardProps) {
+export function FederalScorecardView() {
+  const navigate = useNavigate();
+  const { bioguideId, congress: congressParam } = useParams();
   const [selectedIssue, setSelectedIssue] = useState<string>("overall");
   const [selectedCongress, setSelectedCongress] = useState<number>(
-    initialLegislator.congress
+    congressParam ? parseInt(congressParam) : 0
   );
   const [matrixHeight, setMatrixHeight] = useState<number>(0);
   const matrixRef = useRef<HTMLDivElement>(null);
   const issueListRef = useRef<HTMLDivElement>(null);
-  const [legislator, setLegislator] = useState<VisTable>(initialLegislator);
+  const [legislator, setLegislator] = useState<VisTable | null>(null);
   const [scorecard, setScorecard] = useState<VisScorecardResponse | null>(null);
-  const [_, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
+  // Load legislator data on initial render
   useEffect(() => {
-    const fetchInitialScorecard = async () => {
+    if (!bioguideId || !congressParam) {
+      toast.error("Missing required parameters");
+      navigate("/federal/table");
+      return;
+    }
+
+    const fetchInitialData = async () => {
+      setIsLoading(true);
       try {
-        const newScorecard = await getScorecardData(
-          legislator.congress,
-          legislator.bioguide
+        // Fetch table data to get legislator info
+        const tableData = await getTableData(parseInt(congressParam));
+        const legislatorData = tableData.data.find(
+          (l) => l.bioguide === bioguideId
         );
+
+        if (!legislatorData) {
+          throw new Error("Legislator not found");
+        }
+
+        // Fetch scorecard data
+        const newScorecard = await getScorecardData(
+          parseInt(congressParam),
+          bioguideId
+        );
+
+        setLegislator(legislatorData);
         setScorecard(newScorecard);
+        setSelectedCongress(parseInt(congressParam));
       } catch (err) {
-        console.error("Failed to fetch initial scorecard data:", err);
-        toast.error("Failed to load scorecard");
+        console.error("Failed to fetch initial data:", err);
+        toast.error("Failed to load legislator data");
+        navigate("/federal/table");
+      } finally {
+        setIsLoading(false);
       }
     };
 
-    fetchInitialScorecard();
-  }, [legislator]);
+    fetchInitialData();
+  }, [bioguideId, congressParam, navigate]);
 
   useEffect(() => {
     if (matrixRef.current) {
@@ -69,12 +89,17 @@ export function FederalScorecardView({
   }, [selectedIssue, selectedCongress]);
 
   const handleCongressChange = async (congress: number) => {
+    if (!bioguideId) return;
+    
     setIsLoading(true);
     try {
+      // Update URL to reflect the new congress
+      navigate(`/federal/scorecard/${bioguideId}/${congress}`, { replace: true });
+      
       // Fetch new table data for the selected congress
       const tableData = await getTableData(congress);
       const newLegislator = tableData.data.find(
-        (l) => l.bioguide === initialLegislator.bioguide
+        (l) => l.bioguide === bioguideId
       );
 
       if (!newLegislator) {
@@ -82,10 +107,7 @@ export function FederalScorecardView({
       }
 
       // Fetch new scorecard data
-      const newScorecard = await getScorecardData(
-        congress,
-        initialLegislator.bioguide
-      );
+      const newScorecard = await getScorecardData(congress, bioguideId);
 
       setSelectedCongress(congress);
       setLegislator(newLegislator);
@@ -94,6 +116,7 @@ export function FederalScorecardView({
       // Only reset to overall if the selected issue doesn't exist in the new congress
       if (
         selectedIssue !== "overall" &&
+        newLegislator.iles && 
         !(selectedIssue.toLowerCase() in newLegislator.iles)
       ) {
         setSelectedIssue("overall");
@@ -105,6 +128,11 @@ export function FederalScorecardView({
       setIsLoading(false);
     }
   };
+
+  // Show loading state
+  if (isLoading || !legislator) {
+    return <div className="p-8">Loading legislator data...</div>;
+  }
 
   const locationText = getFederalLocationText(
     legislator.chamber,
@@ -121,7 +149,7 @@ export function FederalScorecardView({
 
   return (
     <div className="space-y-6">
-      <BackButton onClick={onBack} />
+      <BackButton onClick={() => navigate("/federal/table")} />
       <div className="grid grid-areas-scorecard-mobile md:grid-areas-scorecard gap-6">
         {/* Legislator Info and Issue Selection - Left column on desktop, top on mobile */}
         <div className="space-y-6 grid-in-scorecard-info">
@@ -205,7 +233,7 @@ export function FederalScorecardView({
           </Card>
         )}
 
-        {/* Glossary - Bottom on both desktop and mobile */}
+        {/* Glossary - Bottom on both layouts */}
         <div className="grid-in-scorecard-glossary">
           <FederalScorecardGlossary />
         </div>
