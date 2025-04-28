@@ -101,23 +101,19 @@ export function FederalTable({
       congress: currentCongress,
     });
 
-    const flatRows = tableRows
+    const allLegislators = tableRows
       .filter(
         (r): r is { type: "legislator"; data: VisTable } =>
           r.type === "legislator"
       )
-      .map((r) => r.data)
-      .filter((leg) => {
-        const score =
-          selectedIssue === "all"
-            ? leg.les
-            : leg.iles[selectedIssue.toLowerCase().replace(/\s+/g, "")] ?? 0;
-        return score !== 0;
-      });
+      .map((r) => r.data);
 
-    const numLegislators = flatRows.length;
+    // Filter logic is now applied directly in the tableRows calculation above
 
-    const partyCounts = flatRows.reduce((acc, leg) => {
+    // Calculate summary statistics using all legislators (without filtering by score)
+    const numLegislators = allLegislators.length;
+
+    const partyCounts = allLegislators.reduce((acc, leg) => {
       acc[leg.party] = (acc[leg.party] ?? 0) + 1;
       return acc;
     }, {} as Record<string, number>);
