@@ -174,7 +174,6 @@ export function FederalControlPanel({
                 <div className="space-y-2">
                   {filterMode === "state" ? (
                     <>
-                      <label className="text-sm font-medium text-gray-700">STATE</label>
                       <Select
                         value={selectedState}
                         onValueChange={handleStateSelect}
@@ -200,7 +199,7 @@ export function FederalControlPanel({
                     </>
                   ) : (
                     <>
-                      <label className="text-sm font-medium text-gray-700">SEARCH</label>
+                      
                       <SearchInput
                         value={searchInputValue}
                         onChange={handleSearchChange}

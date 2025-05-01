@@ -34,7 +34,7 @@ export function ColumnHeader({
         "hover:text-gray-900 transition-colors",
         "focus:outline-none focus-visible:outline-none",
         isActive ? "text-gray-900" : "text-gray-600",
-        !isSortable && "cursor-not-allowed opacity-50",
+        !isSortable && "opacity-50",
         className
       )}
       onClick={() => isSortable && onSort(sortField)}

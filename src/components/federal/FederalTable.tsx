@@ -71,12 +71,33 @@ export function FederalTable({
     setDistrictFromZip(null);
   }, [searchTerm]);
 
+  // Handle state filter changes
+  useEffect(() => {
+    // If state was the active sort column and a state is selected,
+    // change the sort column to district with ascending sort
+    if (stateFilter !== 'all') {
+      if (sortField === 'state') {
+        setSortField('district');
+        setSortDirection('asc');
+      }
+    }
+  }, [stateFilter, sortField]);
+
   const handleSort = (field: SortField) => {
-    if (
-      (selectedIssue !== "all" && field === "rank") ||
-      (chamber !== "house" && field === "district")
-    )
+    // Don't sort by rank when a specific issue is selected
+    if (selectedIssue !== "all" && field === "rank") {
       return;
+    }
+    
+    // Don't sort by state when a state is selected
+    if (stateFilter !== "all" && field === "state") {
+      return;
+    }
+    
+    // Don't sort by district unless a state is selected
+    if (field === "district" && stateFilter === "all") {
+      return;
+    }
 
     if (sortField === field) {
       setSortDirection(sortDirection === "asc" ? "desc" : "asc");
@@ -101,23 +122,19 @@ export function FederalTable({
       congress: currentCongress,
     });
 
-    const flatRows = tableRows
+    const allLegislators = tableRows
       .filter(
         (r): r is { type: "legislator"; data: VisTable } =>
           r.type === "legislator"
       )
-      .map((r) => r.data)
-      .filter((leg) => {
-        const score =
-          selectedIssue === "all"
-            ? leg.les
-            : leg.iles[selectedIssue.toLowerCase().replace(/\s+/g, "")] ?? 0;
-        return score !== 0;
-      });
+      .map((r) => r.data);
 
-    const numLegislators = flatRows.length;
+    // Filter logic is now applied directly in the tableRows calculation above
 
-    const partyCounts = flatRows.reduce((acc, leg) => {
+    // Calculate summary statistics using all legislators (without filtering by score)
+    const numLegislators = allLegislators.length;
+
+    const partyCounts = allLegislators.reduce((acc, leg) => {
       acc[leg.party] = (acc[leg.party] ?? 0) + 1;
       return acc;
     }, {} as Record<string, number>);
@@ -176,16 +193,23 @@ export function FederalTable({
           currentSort: sortField,
           direction: sortDirection,
           onSort: handleSort,
+          // Disable state sorting when a state is selected
+          disabled: stateFilter !== "all",
+          className: cn(stateFilter !== "all" && "opacity-50"),
         },
         {
           name: "District",
           width: "w-[8%]",
-          sortField: "district",
-          currentSort: sortField,
-          direction: sortDirection,
-          onSort: handleSort,
-          disabled: chamber !== "house",
-          className: cn(chamber !== "house" && "opacity-50 cursor-not-allowed"),
+          ...(stateFilter !== "all" ? {
+            // Only make district sortable when a state is selected
+            sortField: "district",
+            currentSort: sortField,
+            direction: sortDirection,
+            onSort: handleSort,
+          } : {}),
+          // District is only sortable when a state is selected
+          disabled: stateFilter === "all",
+          className: cn(stateFilter === "all" && "opacity-50"),
         },
         {
           name: "Party Rank",
@@ -195,9 +219,7 @@ export function FederalTable({
           direction: sortDirection,
           onSort: handleSort,
           disabled: selectedIssue !== "all",
-          className: cn(
-            selectedIssue !== "all" && "opacity-50 cursor-not-allowed"
-          ),
+          className: cn(selectedIssue !== "all" && "opacity-50"),
         },
         {
           name: "Benchmark",

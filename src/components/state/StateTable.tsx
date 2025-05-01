@@ -87,8 +87,8 @@ export function StateTable({
         (r): r is { type: "legislator"; data: StateVisTable } =>
           r.type === "legislator"
       )
-      .map((r) => r.data)
-      .filter((leg) => leg.sles !== 0);
+      .map((r) => r.data);
+    // Removed filtering of zero scores as per requirement
 
     const numLegislators = flatRows.length;
 

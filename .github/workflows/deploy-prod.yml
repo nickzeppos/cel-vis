@@ -1,9 +1,9 @@
-name: Deploy to GitHub Pages
+name: Deploy to Production GitHub Pages
 
 on:
   push:
     branches:
-      - Master
+      - production-ready
 
 jobs:
   build-and-deploy:
@@ -22,11 +22,11 @@ jobs:
         run: npm install
 
       - name: Build
-        run: npm run build -- --mode development
+        run: npm run build -- --mode production
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./dist
-          destination_dir: dev
+          destination_dir: prod
