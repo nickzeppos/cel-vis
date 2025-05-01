@@ -14,7 +14,7 @@ function AppRouter() {
   // Update height when component first mounts
   useEffect(() => {
     updateHeight();
-    
+
     // Also update height on route changes
     const handleRouteChange = () => {
       // Use requestAnimationFrame to wait for render
@@ -24,10 +24,10 @@ function AppRouter() {
     };
 
     // Listen for route changes
-    window.addEventListener('popstate', handleRouteChange);
-    
+    window.addEventListener("popstate", handleRouteChange);
+
     return () => {
-      window.removeEventListener('popstate', handleRouteChange);
+      window.removeEventListener("popstate", handleRouteChange);
     };
   }, [updateHeight]);
 
@@ -36,18 +36,27 @@ function AppRouter() {
       <Routes>
         {/* Default route redirects to federal table */}
         <Route path="/" element={<Navigate to="/federal/table" replace />} />
-        
+
         {/* Federal routes */}
         <Route path="/federal/table" element={<FederalTableView />} />
-        <Route path="/federal/scorecard/:bioguideId/:congress" element={<FederalScorecardView />} />
-        
+        <Route
+          path="/federal/scorecard/:bioguideId/:congress"
+          element={<FederalScorecardView />}
+        />
+
         {/* State routes */}
         <Route path="/state/table" element={<StateTableView />} />
-        <Route path="/state/scorecard/:state/:slesId/:term" element={<StateScorecardView />} />
-        
+        <Route
+          path="/state/scorecard/:state/:slesId/:term"
+          element={<StateScorecardView />}
+        />
+
         {/* Performance view */}
-        <Route path="/performance/:bioguideId/:congress" element={<PerformanceView />} />
-        
+        <Route
+          path="/performance/:bioguideId/:congress"
+          element={<PerformanceView />}
+        />
+
         {/* Fallback route */}
         <Route path="*" element={<Navigate to="/federal/table" replace />} />
       </Routes>
