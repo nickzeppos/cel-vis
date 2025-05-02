@@ -3,11 +3,7 @@ import { sortAscending } from "@/services/api.utils";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import PerformanceBar from "./PerformanceBar";
 import { Expectation } from "@/lib/expectations";
-
-interface Props {
-  bioguideID: string;
-  congress: number;
-}
+import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 
 type PerformanceData = {
   congress: number;
@@ -47,13 +43,13 @@ function calculateBarData(
   // Normalize values if in normalized mode
   let normalizedScore = score;
   let normalizedBenchmark = benchmark;
-  
+
   if (displayMode === "normalized") {
     // In normalized mode, benchmark becomes 1.0, and score is relative to benchmark
     normalizedScore = score / benchmark;
     normalizedBenchmark = 1.0;
   }
-  
+
   // Derive exceeds and below thresholds from benchmark
   const exceeds = normalizedBenchmark * 1.5;
   const below = normalizedBenchmark * 0.5;
@@ -138,7 +134,7 @@ function PerformanceBarLabels({
   const formatValue = (value: number) => {
     return value.toFixed(3);
   };
-  
+
   // Get the display values based on mode
   const getDisplayValue = (value: number) => {
     if (displayMode === "absolute") {
@@ -148,7 +144,7 @@ function PerformanceBarLabels({
       return `${(value * 100).toFixed(1)}%`;
     }
   };
-  
+
   // Get the actual score to display
   const displayScore = displayMode === "absolute" ? score : score / benchmark;
 
@@ -196,7 +192,10 @@ function PerformanceBarLabels({
   // Calculate text widths (approximate)
   const scoreTextWidth = getDisplayValue(displayScore).length * 6;
   const exceedsTextWidth = `Exceeds (${getDisplayValue(exceeds)})`.length * 6;
-  const benchmarkTextWidth = `Benchmark (${getDisplayValue(displayMode === "absolute" ? benchmark : 1.0)})`.length * 6;
+  const benchmarkTextWidth =
+    `Benchmark (${getDisplayValue(
+      displayMode === "absolute" ? benchmark : 1.0
+    )})`.length * 6;
   const belowTextWidth = `Below (${getDisplayValue(below)})`.length * 6;
 
   return (
@@ -261,8 +260,7 @@ function PerformanceBarLabels({
         <path
           d={`M ${plotX + plotWidth} ${exceedsY} 
               H ${
-                (plotX + plotWidth + (plotX + plotWidth + labelRightOffset)) /
-                2
+                (plotX + plotWidth + (plotX + plotWidth + labelRightOffset)) / 2
               } 
               V ${labelPositions.exceeds + labelHeight / 2} 
               H ${plotX + plotWidth + labelRightOffset}`}
@@ -290,15 +288,15 @@ function PerformanceBarLabels({
           fontSize="10"
           fill="#2563eb"
         >
-          Benchmark ({getDisplayValue(displayMode === "absolute" ? benchmark : 1.0)})
+          Benchmark (
+          {getDisplayValue(displayMode === "absolute" ? benchmark : 1.0)})
         </text>
 
         {/* Connector line from benchmark bar to label */}
         <path
           d={`M ${plotX + plotWidth} ${benchmarkY} 
               H ${
-                (plotX + plotWidth + (plotX + plotWidth + labelRightOffset)) /
-                2
+                (plotX + plotWidth + (plotX + plotWidth + labelRightOffset)) / 2
               } 
               V ${labelPositions.benchmark + labelHeight / 2} 
               H ${plotX + plotWidth + labelRightOffset}`}
@@ -333,8 +331,7 @@ function PerformanceBarLabels({
         <path
           d={`M ${plotX + plotWidth} ${belowY} 
               H ${
-                (plotX + plotWidth + (plotX + plotWidth + labelRightOffset)) /
-                2
+                (plotX + plotWidth + (plotX + plotWidth + labelRightOffset)) / 2
               } 
               V ${labelPositions.below + labelHeight / 2} 
               H ${plotX + plotWidth + labelRightOffset}`}
@@ -347,16 +344,28 @@ function PerformanceBarLabels({
   );
 }
 
-function PerformanceView({ bioguideID, congress }: Props) {
+function PerformanceView() {
+  const { bioguideId } = useParams();
+  const [searchParams] = useSearchParams();
+  const congressParam = searchParams.get("congress");
+  const navigate = useNavigate();
   const [data, setData] = useState<PerformanceData[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const [displayMode, setDisplayMode] = useState<ScoreDisplayMode>("absolute");
 
+  // Validate route parameters
+  useEffect(() => {
+    if (!bioguideId || !congressParam) {
+      console.error("Missing route parameters:", { bioguideId, congressParam });
+      navigate("/federal/table");
+    }
+  }, [bioguideId, congressParam, navigate]);
+
   // TODO: single endpoint to get all this data
   const getPerformanceData = useCallback(
-    (bioguideID: string) =>
-      getScorecardData(congress, bioguideID)
+    (bioguideId: string) =>
+      getScorecardData(Number(congressParam), bioguideId)
         .then(({ data: { validCongresses } }) => validCongresses)
         .then((congresses) =>
           Promise.all(congresses.map(([congress]) => getTableData(congress)))
@@ -364,7 +373,7 @@ function PerformanceView({ bioguideID, congress }: Props) {
         .then((tables) =>
           tables
             .map((t) => {
-              const legislator = t.data.find((l) => l.bioguide === bioguideID);
+              const legislator = t.data.find((l) => l.bioguide === bioguideId);
               return legislator
                 ? {
                     congress: t.congress,
@@ -377,17 +386,22 @@ function PerformanceView({ bioguideID, congress }: Props) {
             .filter(notNull)
         )
         .then((data) => sortAscending(data, (d) => d.congress)),
-    [congress]
+    [congressParam]
   );
 
   useEffect(() => {
+    if (!bioguideId) return;
+
     setIsLoading(true);
-    getPerformanceData(bioguideID)
+    getPerformanceData(bioguideId)
       .then(setData)
+      .catch((error) => {
+        console.error("Error fetching performance data:", error);
+      })
       .finally(() => {
         setIsLoading(false);
       });
-  }, [bioguideID, getPerformanceData]);
+  }, [bioguideId, getPerformanceData]);
 
   // Calculate global min/max range for all bars
   const globalRange = useMemo(() => {
@@ -397,20 +411,20 @@ function PerformanceView({ bioguideID, congress }: Props) {
     // that includes 0.5 (below), 1.0 (benchmark), and 1.5 (exceeds)
     if (displayMode === "normalized") {
       // Get all normalized scores
-      const normalizedScores = data.map(d => d.score / d.benchmark);
-      
+      const normalizedScores = data.map((d) => d.score / d.benchmark);
+
       // Find min and max of normalized scores
       const min = Math.min(...normalizedScores, 0.5); // Include below threshold
       const max = Math.max(...normalizedScores, 1.5); // Include exceeds threshold
-      
+
       // Add margin
       const range = max - min;
       const margin = range * 0.2;
-      
+
       // Ensure we always include at least 0.5 to 1.5 range
       return [
         Math.max(0, Math.min(min - margin, 0.4)), // Never go below 0, try to include below threshold
-        Math.max(max + margin, 1.6) // Always include exceeds threshold with margin
+        Math.max(max + margin, 1.6), // Always include exceeds threshold with margin
       ] as [number, number];
     } else {
       // Absolute mode - use actual values
@@ -456,7 +470,7 @@ function PerformanceView({ bioguideID, congress }: Props) {
   return (
     <div className="flex flex-col">
       <div className="flex justify-between items-center mb-4">
-        <div>{bioguideID}</div>
+        <div>{bioguideId}</div>
         <button
           onClick={toggleDisplayMode}
           className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300"
@@ -474,7 +488,7 @@ function PerformanceView({ bioguideID, congress }: Props) {
         <g>
           {data.map((d, index) => {
             const xPosition = leftMargin + index * (barWidth + spacing);
-            
+
             // Pre-calculate all the bar data
             const barData = calculateBarData(
               d.score,
@@ -486,15 +500,18 @@ function PerformanceView({ bioguideID, congress }: Props) {
               barHeight,
               displayMode
             );
-            
+
             // Set opacity based on hover state
             const isCurrentlyHovered = hoveredIndex === index;
-            const opacity = hoveredIndex === null || isCurrentlyHovered ? 1 : 0.2;
-            
+            const opacity =
+              hoveredIndex === null || isCurrentlyHovered ? 1 : 0.2;
+
             return (
               <g key={d.congress} opacity={opacity}>
                 <PerformanceBar
-                  score={displayMode === "absolute" ? d.score : d.score / d.benchmark}
+                  score={
+                    displayMode === "absolute" ? d.score : d.score / d.benchmark
+                  }
                   benchmark={displayMode === "absolute" ? d.benchmark : 1.0}
                   range={globalRange}
                   x={xPosition}
@@ -545,8 +562,8 @@ function PerformanceView({ bioguideID, congress }: Props) {
   );
 }
 
-export default function WithCongressList(props: Props) {
-  return <PerformanceView {...props} />;
+export default function WithCongressList() {
+  return <PerformanceView />;
 }
 
 function notNull<T>(value: T | null): value is T {

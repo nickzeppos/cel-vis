@@ -4,15 +4,72 @@ import { FederalTableGlossary } from "@/components/federal/FederalTableGlossary"
 import { BaseTableView } from "@/components/shared/BaseTableView";
 import { LevelToggle } from "@/components/shared/LevelToggle";
 import { useFederalState } from "@/hooks/useFederalState";
-import { ViewRoute } from "@/lib/types";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { useEffect } from "react";
 
-type FederalTableViewProps = {
-  route: ViewRoute;
-  setRoute: (route: ViewRoute) => void;
-};
-
-function FederalTableView({ setRoute }: FederalTableViewProps) {
+function FederalTableView() {
+  const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const federalState = useFederalState();
+
+  // Sync URL parameters with state
+  useEffect(() => {
+    // Get parameters from URL if they exist
+    const congressParam = searchParams.get("congress");
+    const chamberParam = searchParams.get("chamber");
+    const stateParam = searchParams.get("state");
+    const issueParam = searchParams.get("issue");
+    const searchParam = searchParams.get("search");
+
+    // Update state from URL parameters if they exist
+    if (congressParam && !isNaN(Number(congressParam))) {
+      federalState.handleCongressChange(congressParam);
+    }
+    if (chamberParam && (chamberParam === "house" || chamberParam === "senate")) {
+      federalState.setChamber(chamberParam);
+    }
+    if (stateParam) {
+      federalState.setStateFilter(stateParam);
+    }
+    if (issueParam) {
+      federalState.setSelectedIssue(issueParam);
+    }
+    if (searchParam) {
+      federalState.setSearchTerm(searchParam);
+    }
+  }, []); // Only run once on component mount
+
+  // Update URL parameters when state changes
+  useEffect(() => {
+    const params = new URLSearchParams();
+    
+    // Only add parameters that have values
+    if (federalState.congress) {
+      params.set("congress", federalState.congress.toString());
+    }
+    if (federalState.chamber) {
+      params.set("chamber", federalState.chamber);
+    }
+    if (federalState.stateFilter) {
+      params.set("state", federalState.stateFilter);
+    }
+    if (federalState.selectedIssue) {
+      params.set("issue", federalState.selectedIssue);
+    }
+    if (federalState.searchTerm) {
+      params.set("search", federalState.searchTerm);
+    }
+    
+    // Update URL without causing a navigation
+    setSearchParams(params, { replace: true });
+  }, [
+    federalState.congress,
+    federalState.chamber,
+    federalState.stateFilter,
+    federalState.selectedIssue,
+    federalState.searchTerm,
+    setSearchParams
+  ]);
 
   return (
     <BaseTableView
@@ -20,9 +77,7 @@ function FederalTableView({ setRoute }: FederalTableViewProps) {
         <LevelToggle
           level="federal"
           onLevelChange={(newLevel) =>
-            setRoute({
-              type: newLevel === "state" ? "state:table" : "federal:table",
-            })
+            navigate(newLevel === "state" ? "/state/table" : "/federal/table")
           }
         />
       }
@@ -47,9 +102,21 @@ function FederalTableView({ setRoute }: FederalTableViewProps) {
           stateFilter={federalState.stateFilter}
           searchTerm={federalState.searchTerm}
           selectedIssue={federalState.selectedIssue}
-          onLegislatorSelect={(legislator) =>
-            setRoute({ type: "federal:scorecard", legislator })
-          }
+          onLegislatorSelect={(legislator) => {
+            // Build the URL with query parameters
+            const url = new URL(`/federal/scorecard/${legislator.bioguide}`, window.location.origin);
+            
+            // Add congress parameter
+            url.searchParams.set('congress', federalState.congress.toString());
+            
+            // Add issue parameter if it's not 'all'
+            if (federalState.selectedIssue && federalState.selectedIssue !== 'all') {
+              url.searchParams.set('issue', federalState.selectedIssue);
+            }
+            
+            navigate(url.pathname + url.search);
+          }}
+          
         />
       }
       glossary={<FederalTableGlossary />}
