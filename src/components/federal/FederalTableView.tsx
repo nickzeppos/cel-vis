@@ -102,9 +102,21 @@ function FederalTableView() {
           stateFilter={federalState.stateFilter}
           searchTerm={federalState.searchTerm}
           selectedIssue={federalState.selectedIssue}
-          onLegislatorSelect={(legislator) =>
-            navigate(`/federal/scorecard/${legislator.bioguide}/${federalState.congress}`)
-          }
+          onLegislatorSelect={(legislator) => {
+            // Build the URL with query parameters
+            const url = new URL(`/federal/scorecard/${legislator.bioguide}`, window.location.origin);
+            
+            // Add congress parameter
+            url.searchParams.set('congress', federalState.congress.toString());
+            
+            // Add issue parameter if it's not 'all'
+            if (federalState.selectedIssue && federalState.selectedIssue !== 'all') {
+              url.searchParams.set('issue', federalState.selectedIssue);
+            }
+            
+            navigate(url.pathname + url.search);
+          }}
+          
         />
       }
       glossary={<FederalTableGlossary />}

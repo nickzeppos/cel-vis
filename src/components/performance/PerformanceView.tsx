@@ -3,7 +3,7 @@ import { sortAscending } from "@/services/api.utils";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import PerformanceBar from "./PerformanceBar";
 import { Expectation } from "@/lib/expectations";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 
 type PerformanceData = {
   congress: number;
@@ -345,7 +345,9 @@ function PerformanceBarLabels({
 }
 
 function PerformanceView() {
-  const { bioguideId, congress: congressParam } = useParams();
+  const { bioguideId } = useParams();
+  const [searchParams] = useSearchParams();
+  const congressParam = searchParams.get("congress");
   const navigate = useNavigate();
   const [data, setData] = useState<PerformanceData[]>([]);
   const [isLoading, setIsLoading] = useState(false);

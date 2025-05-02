@@ -12,12 +12,19 @@ import { ScoreMatrix } from "@/components/shared/ScoreMatrix";
 import { CongressSelector } from "@/components/federal/CongressSelector";
 import { FederalScorecardGlossary } from "@/components/federal/FederalScorecardGlossary";
 import { IssueCarousel } from "@/components/federal/IssueCarousel";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 
 export function FederalScorecardView() {
   const navigate = useNavigate();
-  const { bioguideId, congress: congressParam } = useParams();
-  const [selectedIssue, setSelectedIssue] = useState<string>("overall");
+  const { bioguideId } = useParams();
+  const [searchParams, setSearchParams] = useSearchParams();
+  
+  // Get congress and issue from URL query parameters
+  const congressParam = searchParams.get("congress");
+  const issueParam = searchParams.get("issue");
+  const [selectedIssue, setSelectedIssue] = useState<string>(
+    issueParam || "overall"
+  );
   const [selectedCongress, setSelectedCongress] = useState<number>(
     congressParam ? parseInt(congressParam) : 0
   );
@@ -76,6 +83,22 @@ export function FederalScorecardView() {
     }
   }, [scorecard]);
 
+  // Update URL when selected issue or congress changes
+  useEffect(() => {
+    if (selectedIssue && selectedCongress) {
+      const params = new URLSearchParams(searchParams);
+      params.set("congress", selectedCongress.toString());
+      
+      if (selectedIssue !== "overall") {
+        params.set("issue", selectedIssue);
+      } else {
+        params.delete("issue");
+      }
+      
+      setSearchParams(params, { replace: true });
+    }
+  }, [selectedIssue, selectedCongress, searchParams, setSearchParams]);
+
   // Scroll to selected issue whenever it changes or when congress changes
   useEffect(() => {
     if (issueListRef.current && selectedIssue !== "overall") {
@@ -93,8 +116,8 @@ export function FederalScorecardView() {
     
     setIsLoading(true);
     try {
-      // Update URL to reflect the new congress
-      navigate(`/federal/scorecard/${bioguideId}/${congress}`, { replace: true });
+      // Update selected congress state - URL will be updated by the effect
+      setSelectedCongress(congress);
       
       // Fetch new table data for the selected congress
       const tableData = await getTableData(congress);
@@ -109,7 +132,6 @@ export function FederalScorecardView() {
       // Fetch new scorecard data
       const newScorecard = await getScorecardData(congress, bioguideId);
 
-      setSelectedCongress(congress);
       setLegislator(newLegislator);
       setScorecard(newScorecard);
 

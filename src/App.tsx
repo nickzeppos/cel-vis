@@ -40,20 +40,20 @@ function AppRouter() {
         {/* Federal routes */}
         <Route path="/federal/table" element={<FederalTableView />} />
         <Route
-          path="/federal/scorecard/:bioguideId/:congress"
+          path="/federal/scorecard/:bioguideId"
           element={<FederalScorecardView />}
         />
 
         {/* State routes */}
         <Route path="/state/table" element={<StateTableView />} />
         <Route
-          path="/state/scorecard/:state/:slesId/:term"
+          path="/state/scorecard/:state/:slesId"
           element={<StateScorecardView />}
         />
 
         {/* Performance view */}
         <Route
-          path="/performance/:bioguideId/:congress"
+          path="/performance/:bioguideId"
           element={<PerformanceView />}
         />
 

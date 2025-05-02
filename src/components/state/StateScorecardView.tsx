@@ -25,11 +25,13 @@ import { PartyLabel } from "@/components/shared/PartyLabel";
 import { ScoreMatrix } from "@/components/shared/ScoreMatrix";
 import { StateScorecardGlossary } from "@/components/state/StateScorecardGlossary";
 import { Term } from "@/lib/types";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 
 export function StateScorecardView() {
   const navigate = useNavigate();
-  const { state, slesId, term: termParam } = useParams();
+  const { state, slesId } = useParams();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const termParam = searchParams.get("term");
   const [selectedTerm, setSelectedTerm] = useState<Term | null>(null);
   const [legislator, setLegislator] = useState<StateVisTable | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -114,8 +116,10 @@ export function StateScorecardView() {
     const { startYear, endYear } = term;
     
     try {
-      // Update URL to reflect the new term
-      navigate(`/state/scorecard/${state}/${slesId}/${startYear}-${endYear}`, { replace: true });
+      // Update URL to reflect the new term using query parameters
+      const params = new URLSearchParams(searchParams);
+      params.set('term', `${startYear}-${endYear}`);
+      setSearchParams(params, { replace: true });
       
       // Fetch new table data first to get updated LES and rank
       const tableData = await getStateTableData(

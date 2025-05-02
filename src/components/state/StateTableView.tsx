@@ -39,18 +39,21 @@ function StateTableView() {
   useEffect(() => {
     const params = new URLSearchParams();
     
-    // Only add parameters that have values
+    // Only add parameters if a state is selected
     if (stateState.selectedState) {
+      // Add the state parameter
       params.set("state", stateState.selectedState);
-    }
-    if (stateState.selectedTerm) {
-      params.set("term", stateState.selectedTerm);
-    }
-    if (stateState.stateChamber) {
-      params.set("chamber", stateState.stateChamber);
-    }
-    if (stateState.stateSearchTerm) {
-      params.set("search", stateState.stateSearchTerm);
+      
+      // Only add other parameters when a state is selected
+      if (stateState.selectedTerm) {
+        params.set("term", stateState.selectedTerm);
+      }
+      if (stateState.stateChamber) {
+        params.set("chamber", stateState.stateChamber);
+      }
+      if (stateState.stateSearchTerm) {
+        params.set("search", stateState.stateSearchTerm);
+      }
     }
     
     // Update URL without causing a navigation
@@ -90,9 +93,18 @@ function StateTableView() {
           selectedTerm={stateState.selectedTerm}
           chamber={stateState.stateChamber}
           searchTerm={stateState.stateSearchTerm}
-          onLegislatorSelect={(legislator) =>
-            navigate(`/state/scorecard/${stateState.selectedState}/${legislator.slesId}/${stateState.selectedTerm}`)
-          }
+          onLegislatorSelect={(legislator) => {
+            // Build the URL with query parameters
+            const url = new URL(`/state/scorecard/${stateState.selectedState}/${legislator.slesId}`, window.location.origin);
+            
+            // Add term parameter
+            if (stateState.selectedTerm) {
+              url.searchParams.set('term', stateState.selectedTerm);
+            }
+            
+            navigate(url.pathname + url.search);
+          }}
+          
         />
       }
       glossary={<StateTableGlossary />}
