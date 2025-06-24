@@ -15,7 +15,7 @@ export const getValidCongressDisplayName = ([
   congress,
   chamber,
 ]: ValidCongress): string => {
-  const chamberName = getChamberDisplayName(chamber);
+  const chamberName = getFederalChamberDisplayName(chamber);
   return `${getCongressDisplayName(congress)} ${chamberName}`;
 };
 
@@ -57,8 +57,11 @@ export const getIssueDisplayName = (issue: string): string => {
     : issue;
 };
 
-export const getChamberDisplayName = (chamber: string): string => {
-  return chamber === "S" ? "Senate" : "House";
+export const getFederalChamberDisplayName = (chamber: string): string => {
+  if (chamber === "S" || chamber === "senate") return "Senate";
+  else return "House";
+
+  // return chamber === "S" ? "Senate" : "House";
 };
 
 export const getStateChamberDisplayName = (chamber: StateChamber): string => {
