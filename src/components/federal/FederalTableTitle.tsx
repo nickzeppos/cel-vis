@@ -3,7 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import {
   getIssueDisplayName,
   getCongressDisplayName,
-  getChamberDisplayName,
+  getFederalChamberDisplayName,
 } from "@/lib/display";
 import { getFederalPartyOrder } from "@/lib/parties";
 import { cn } from "@/lib/utils";
@@ -30,7 +30,7 @@ export function FederalTableTitle({
   summary,
 }: FederalTableTitleProps) {
   const isAllStates = state === "all";
-  const chamberLabel = getChamberDisplayName(chamber);
+  const chamberLabel = getFederalChamberDisplayName(chamber);
   const congressLabel = `${getCongressDisplayName(
     parseInt(congress)
   )} Congress`;
