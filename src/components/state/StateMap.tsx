@@ -1,12 +1,10 @@
 import { Map } from "@/components/shared/Map";
+import { AVAILABLE_STATES } from "@/lib/consts";
 
 interface StateMapProps {
   selectedState: string;
   onStateSelect: (state: string) => void;
 }
-
-// States with available data
-const AVAILABLE_STATES = ["GA", "MT"] as const;
 
 export function StateMap({ selectedState, onStateSelect }: StateMapProps) {
   return (
