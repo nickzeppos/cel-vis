@@ -25,64 +25,109 @@ import { PartyLabel } from "@/components/shared/PartyLabel";
 import { ScoreMatrix } from "@/components/shared/ScoreMatrix";
 import { StateScorecardGlossary } from "@/components/state/StateScorecardGlossary";
 import { Term } from "@/lib/types";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 
-interface StateScorecardProps {
-  legislator: StateVisTable;
-  onBack: () => void;
-}
-
-export function StateScorecardView({
-  legislator: initialLegislator,
-  onBack,
-}: StateScorecardProps) {
-  const [selectedTerm, setSelectedTerm] = useState<Term>(
-    initialLegislator.term
-  );
-  const [legislator, setLegislator] =
-    useState<StateVisTable>(initialLegislator);
-  const [isLoading, setIsLoading] = useState(false);
+export function StateScorecardView() {
+  const navigate = useNavigate();
+  const { state, slesId } = useParams();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const termParam = searchParams.get("term");
+  const [selectedTerm, setSelectedTerm] = useState<Term | null>(null);
+  const [legislator, setLegislator] = useState<StateVisTable | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const [scorecard, setScorecard] = useState<StateVisScorecardResponse | null>(
     null
   );
 
+  // Load initial data when component mounts
   useEffect(() => {
-    const fetchInitialScorecard = async () => {
+    if (!state || !slesId || !termParam) {
+      toast.error("Missing required parameters");
+      navigate("/state/table");
+      return;
+    }
+
+    const fetchInitialData = async () => {
       try {
-        const newScorecard = await getStateScorecardData(
-          legislator.slesId,
-          legislator.term.startYear,
-          legislator.term.endYear
+        // Parse term from URL parameter (format: "2023-2024")
+        const [startYear, endYear] = termParam.split("-").map(Number);
+        
+        if (isNaN(startYear) || isNaN(endYear)) {
+          throw new Error("Invalid term format");
+        }
+
+        // Fetch table data with the state we already know from the URL
+        const tableData = await getStateTableData(
+          state!,
+          startYear,
+          endYear
         );
+
+        const legislatorData = tableData.data.find(
+          (l) => l.slesId === parseInt(slesId!)
+        );
+
+        if (!legislatorData) {
+          throw new Error("Legislator not found");
+        }
+
+        // We already have the legislator data from the first API call
+        const updatedLegislator = legislatorData;
+        
+        // No need for a second check since we already found the legislator
+
+        // Fetch scorecard data
+        const newScorecard = await getStateScorecardData(
+          parseInt(slesId),
+          startYear,
+          endYear
+        );
+
+        setSelectedTerm({ startYear, endYear });
+        setLegislator(updatedLegislator);
         setScorecard(newScorecard);
       } catch (err) {
-        console.error("failed to fetch initials corecard data:", err);
-        toast.error("Failed to load scorecard");
+        console.error("Failed to fetch initial data:", err);
+        toast.error("Failed to load legislator data");
+        navigate("/state/table");
+      } finally {
+        setIsLoading(false);
       }
     };
 
-    fetchInitialScorecard();
-  }, [legislator]);
+    fetchInitialData();
+  }, [slesId, termParam, navigate]);
 
   const handleTermChange = async (termString: string) => {
+    if (!legislator || !scorecard || !slesId) return;
+    
     setIsLoading(true);
 
-    const term = scorecard?.validStateTerms.find(
+    const term = scorecard.validStateTerms.find(
       (term) => getTermDisplayName(term) === termString
     );
+    
     if (!term) {
       toast.error("Invalid term selected");
       setIsLoading(false);
       return;
     }
+    
     const { startYear, endYear } = term;
+    
     try {
-      // TODO: Add endpoint that supports atomic return for term + lesId rather than filtering response on this side
+      // Update URL to reflect the new term using query parameters
+      const params = new URLSearchParams(searchParams);
+      params.set('term', `${startYear}-${endYear}`);
+      setSearchParams(params, { replace: true });
+      
       // Fetch new table data first to get updated LES and rank
       const tableData = await getStateTableData(
-        legislator.state,
+        state!, // Use the state from URL params instead of legislator.state
         startYear,
         endYear
       );
+      
       const updatedLegislator = tableData.data.find(
         (l) => l.slesId === legislator.slesId
       );
@@ -94,7 +139,7 @@ export function StateScorecardView({
 
       // Then fetch new scorecard data
       const newScorecard = await getStateScorecardData(
-        legislator.slesId,
+        parseInt(slesId),
         startYear,
         endYear
       );
@@ -111,6 +156,11 @@ export function StateScorecardView({
     }
   };
 
+  // Show loading state
+  if (isLoading || !legislator || !selectedTerm) {
+    return <div className="p-8">Loading legislator data...</div>;
+  }
+
   // Location text
   const locationText = getStateLocationText(legislator.district);
 
@@ -120,7 +170,7 @@ export function StateScorecardView({
 
   return (
     <div className="space-y-6">
-      <BackButton onClick={onBack} />
+      <BackButton onClick={() => navigate("/state/table")} />
       <div className="grid grid-areas-scorecard-mobile md:grid-areas-scorecard gap-6">
         {/* Legislator Info and Term Selection - Left column on desktop, top on mobile */}
         <div className="space-y-6 grid-in-scorecard-info">
