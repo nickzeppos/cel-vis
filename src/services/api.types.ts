@@ -117,7 +117,7 @@ export const stateVisTableValidator = z.object({
   slesId: z.number(),
   name: z.string(),
   party: statePartyInitialValidator,
-  district: z.number(),
+  district: z.union([z.string(), z.number()]),
   sles: z.number(),
   benchmark: z.number(),
   partyRank: z.number(),
