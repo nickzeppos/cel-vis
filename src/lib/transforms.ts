@@ -95,10 +95,31 @@ export function getFederalTableRows({
         : districtB - districtA;
     });
   } else if (sortField === "rank" && selectedIssue === "all") {
-    sorted =
-      sortDirection === "asc"
-        ? sortAscending(filtered, (l) => l.partyRank)
-        : sortDescending(filtered, (l) => l.partyRank);
+    // sorted =
+    //   sortDirection === "asc"
+    //     ? sortAscending(filtered, (l) => l.partyRank)
+    //     : sortDescending(filtered, (l) => l.partyRank);
+    sorted = [...filtered].sort((a, b) => {
+      // Check if either row corresponds to independent
+      const aHasRank = a.party !== "I";
+      const bHasRank = b.party !== "I";
+
+      // If one has rank and the other doesn't always anchor I rows to bottom
+      if (aHasRank && !bHasRank) return -1;
+      if (!aHasRank && bHasRank) return 1;
+
+      // if both have no rank (i.e., both I), consider sort by name
+      if (!aHasRank && !bHasRank) {
+        return sortDirection === "asc"
+          ? a.name.localeCompare(b.name)
+          : b.name.localeCompare(a.name);
+      }
+
+      // if both have ranks, normal ranked sort
+      return sortDirection === "asc"
+        ? a.partyRank - b.partyRank
+        : b.partyRank - a.partyRank;
+    });
   } else if (sortField === "score") {
     const getScore = (l: VisTable) =>
       selectedIssue === "all"
@@ -177,10 +198,31 @@ export function getStateTableRows({
     );
     // sort on rank, numeric
   } else if (sortField === "rank") {
-    sorted =
-      sortDirection === "asc"
-        ? sortAscending(filtered, (l) => l.partyRank)
-        : sortDescending(filtered, (l) => l.partyRank);
+    // sorted =
+    //   sortDirection === "asc"
+    //     ? sortAscending(filtered, (l) => l.partyRank)
+    //     : sortDescending(filtered, (l) => l.partyRank);
+    sorted = [...filtered].sort((a, b) => {
+      // check if either row corresponds to independent or 3rd party
+      const aHasRank = a.party !== "I" && a.party !== "3rd";
+      const bHasRank = b.party !== "I" && b.party !== "3rd";
+
+      // anchor non major parties to bottom
+      if (aHasRank && !bHasRank) return -1;
+      if (!aHasRank && bHasRank) return 1;
+
+      // if both have no rank (i.e., both I or 3rd), consider sort by name
+      if (!aHasRank && !bHasRank) {
+        return sortDirection === "asc"
+          ? a.name.localeCompare(b.name)
+          : b.name.localeCompare(a.name);
+      }
+      // if both have ranks, normal ranked sort
+      return sortDirection === "asc"
+        ? a.partyRank - b.partyRank
+        : b.partyRank - a.partyRank;
+    });
+
     // sort on score, numeric
   } else if (sortField === "score") {
     sorted =
