@@ -43,7 +43,9 @@ export function StateTableRow({ row, onClick }: StateTableRowProps) {
 
       {/* Party Rank */}
       <TableCell className="w-[15%] pl-4 font-mono">
-        {row.partyRank}/{row.partyTotal}
+        {row.party === "I" || row.party === "3rd"
+          ? "—"
+          : `${row.partyRank}/${row.partyTotal}`}
       </TableCell>
 
       {/* Benchmark */}

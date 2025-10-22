@@ -71,7 +71,10 @@ export function FederalTableRow({
           isIssueSelected && "opacity-50"
         )}
       >
-        {isIssueSelected ? "—" : `${row.partyRank}/${row.partyTotal}`}
+        {/* Party rank to be renderd as dash when issue is selected or when row corresponds to legislator in non-majority party */}
+        {isIssueSelected || row.party === "I"
+          ? "—"
+          : `${row.partyRank}/${row.partyTotal}`}
       </TableCell>
 
       {/* Benchmark */}
