@@ -108,11 +108,9 @@ export function getFederalTableRows({
       if (aHasRank && !bHasRank) return -1;
       if (!aHasRank && bHasRank) return 1;
 
-      // if both have no rank (i.e., both I), consider sort by name
+      // if both have no rank (i.e., both I), sort by score
       if (!aHasRank && !bHasRank) {
-        return sortDirection === "asc"
-          ? a.name.localeCompare(b.name)
-          : b.name.localeCompare(a.name);
+        return sortDirection === "asc" ? a.les - b.les : b.les - a.les;
       }
 
       // if both have ranks, normal ranked sort
@@ -211,11 +209,9 @@ export function getStateTableRows({
       if (aHasRank && !bHasRank) return -1;
       if (!aHasRank && bHasRank) return 1;
 
-      // if both have no rank (i.e., both I or 3rd), consider sort by name
+      // if both have no rank (i.e., both I or 3rd), sort by score
       if (!aHasRank && !bHasRank) {
-        return sortDirection === "asc"
-          ? a.name.localeCompare(b.name)
-          : b.name.localeCompare(a.name);
+        return sortDirection === "asc" ? a.sles - b.sles : b.sles - a.sles;
       }
       // if both have ranks, normal ranked sort
       return sortDirection === "asc"
