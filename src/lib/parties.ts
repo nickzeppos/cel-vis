@@ -20,5 +20,5 @@ export function getStatePartyOrder(
     (row) => row.party === "D" && row.chamber === chamber
   )?.isMajority;
 
-  return isMajorityD ? ["D", "R", "3rd"] : ["R", "D", "3rd"];
+  return isMajorityD ? ["D", "R", "I", "3rd"] : ["R", "D", "I", "3rd"];
 }

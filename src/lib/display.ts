@@ -19,8 +19,9 @@ export const getValidCongressDisplayName = ([
   return `${getCongressDisplayName(congress)} ${chamberName}`;
 };
 
-export const getStateLocationText = (district: number | null): string =>
-  `District ${district}`;
+export const getStateLocationText = (
+  district: number | string | null
+): string => `District ${district}`;
 export const getFederalLocationText = (
   chamber: FederalChamberInitial,
   state: string,

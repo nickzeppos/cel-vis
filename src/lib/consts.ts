@@ -18,7 +18,7 @@ export const chamberLabels: {
   },
 } as const;
 
-export const AVAILABLE_STATES = ["GA", "MT", "PA", "IL"] as const;
+export const AVAILABLE_STATES = ["GA", "MT", "PA", "IL", "CA"] as const;
 
 export const partyOrder: PartyOrderConfig = [
   [93, { H: ["D", "R"], S: ["D", "R", "I"] }],
