@@ -30,7 +30,7 @@ export function ColumnHeader({
     <button
       className={cn(
         "font-medium flex items-center gap-2 w-full p-0",
-        "appearance-none bg-transparent border-0",
+        "appearance-none bg-transparent border-none",
         "hover:text-gray-900 transition-colors",
         "focus:outline-none focus-visible:outline-none",
         isActive ? "text-gray-900" : "text-gray-600",
