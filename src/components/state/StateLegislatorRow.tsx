@@ -48,7 +48,11 @@ export function StateLegislatorRow({
           </span>
         </div>
         <div className="w-[120px] pl-4 flex items-center font-mono">
-          <span>{legislator.benchmark.toFixed(3)}</span>
+          <span>
+            {legislator.benchmark === null
+              ? "—"
+              : legislator.benchmark.toFixed(3)}
+          </span>
         </div>
         <div className="w-[120px] pl-4 flex items-center">
           <span
