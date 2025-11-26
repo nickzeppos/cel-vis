@@ -50,7 +50,7 @@ export function StateTableRow({ row, onClick }: StateTableRowProps) {
 
       {/* Benchmark */}
       <TableCell className="w-[10%] pl-4 font-mono">
-        {row.benchmark.toFixed(3)}
+        {row.benchmark === null ? "—" : row.benchmark.toFixed(3)}
       </TableCell>
 
       {/* SLES + Expectation */}
