@@ -133,7 +133,8 @@ export function StateTable({
           currentSort: sortField,
           direction: sortDirection,
           onSort: handleSort,
-          className: "sticky left-0 bg-card/95 z-10 border-r border-border/80 after:absolute after:right-0 after:top-0 after:h-full after:w-[1px] after:shadow-[0_0_8px_rgba(0,0,0,0.1)]",
+          className:
+            "sticky left-0 bg-card/95 z-10 border-r border-border/80 after:absolute after:right-0 after:top-0 after:h-full after:w-[1px] after:shadow-[0_0_8px_rgba(0,0,0,0.1)]",
         },
         {
           name: "Party", // Party is not sortable
@@ -142,7 +143,7 @@ export function StateTable({
         {
           name: "District",
           width: "w-[12%]",
-          sortField: "district", // Add this sort field
+          sortField: "district",
           currentSort: sortField,
           direction: sortDirection,
           onSort: handleSort,
