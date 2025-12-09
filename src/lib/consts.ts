@@ -19,7 +19,7 @@ export const chamberLabels: {
 } as const;
 
 export const AVAILABLE_STATES = [
-  "AL",
+  // "AL",
   "GA",
   "MT",
   // "LA",
