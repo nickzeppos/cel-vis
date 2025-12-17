@@ -95,10 +95,6 @@ export function getFederalTableRows({
         : districtB - districtA;
     });
   } else if (sortField === "rank" && selectedIssue === "all") {
-    // sorted =
-    //   sortDirection === "asc"
-    //     ? sortAscending(filtered, (l) => l.partyRank)
-    //     : sortDescending(filtered, (l) => l.partyRank);
     sorted = [...filtered].sort((a, b) => {
       // Check if either row corresponds to independent
       const aHasRank = a.party !== "I";
@@ -231,14 +227,41 @@ export function getStateTableRows({
       const distA = parseDistrict(a.district);
       const distB = parseDistrict(b.district);
 
+      // Handle alphanumeric districts (e.g., "1A", "1B", "2A")
+      if (distA.isAlphanumeric || distB.isAlphanumeric) {
+        // First compare by number
+        const numberComparison =
+          sortDirection === "asc"
+            ? distA.number - distB.number
+            : distB.number - distA.number;
+
+        if (numberComparison !== 0) {
+          return numberComparison;
+        }
+
+        // If numbers are the same, compare by letter
+        const letterComparison =
+          sortDirection === "asc"
+            ? distA.letter.localeCompare(distB.letter)
+            : distB.letter.localeCompare(distA.letter);
+
+        if (letterComparison !== 0) {
+          return letterComparison;
+        }
+
+        // If district values are identical, use name as tiebreaker
+        return sortDirection === "asc"
+          ? a.name.localeCompare(b.name)
+          : b.name.localeCompare(a.name);
+      }
+
+      // Handle county format districts (e.g., "Clark-1", "Capital")
       if (distA.isCountyFormat || distB.isCountyFormat) {
-        // County > Number
         const countyComparison =
           sortDirection === "asc"
             ? distA.county.localeCompare(distB.county)
             : distB.county.localeCompare(distA.county);
 
-        // if same county, sort by number
         if (countyComparison === 0) {
           return sortDirection === "asc"
             ? distA.number - distB.number
@@ -248,7 +271,7 @@ export function getStateTableRows({
         return countyComparison;
       }
 
-      // if not county format, do simple numeric sort
+      // Handle simple numeric districts
       return sortDirection === "asc"
         ? distA.number - distB.number
         : distB.number - distA.number;
@@ -297,27 +320,51 @@ export function flattenGroupedRows(rows: GroupedFederalRow[]): VisTable[] {
 // Helper fn for state district sort behavior
 // Districts are most often just numbers, but in some cases they require specific handling
 // E.g., In NV upper, districts are "Clark-1", "Clark-2", "Capital", etc.
+// E.g., In MD lower, districts can be alphanumeric like "1A", "1B", "2A", etc.
 
 // Currently this just parse based. But you can easily imagine a config based approach, e.g., (state) => { ...rules... }
 // Since this is the first instance of special handling, I'm sticking with parsing + ifs. But, if this grows, revisit.
 const parseDistrict = (district: string | number) => {
   const distStr = district.toString();
   let isCountyFormat = false;
+  let isAlphanumeric = false;
 
-  // One of two ways it's countyFormat:
+  // One of three ways it's special format:
   // (1) contains a hyphen (e.g., "Clark-1")
   if (distStr.includes("-")) {
     isCountyFormat = true;
     const [county, numberStr] = distStr.split("-");
     const number = parseInt(numberStr);
-    return { county, number, isCountyFormat };
+    return { county, number, letter: "", isCountyFormat, isAlphanumeric };
   }
-  // (2) is purely non-numeric (e.g., "Capital")
+
+  // (2) is alphanumeric (e.g., "1A", "23B")
+  const alphanumericMatch = distStr.match(/^(\d+)([A-Za-z])$/);
+  if (alphanumericMatch) {
+    isAlphanumeric = true;
+    const number = parseInt(alphanumericMatch[1]);
+    const letter = alphanumericMatch[2].toUpperCase();
+    return { county: "", number, letter, isCountyFormat, isAlphanumeric };
+  }
+
+  // (3) is purely non-numeric (e.g., "Capital")
   if (isNaN(parseInt(distStr))) {
     isCountyFormat = true;
-    return { county: distStr, number: 0, isCountyFormat };
+    return {
+      county: distStr,
+      number: 0,
+      letter: "",
+      isCountyFormat,
+      isAlphanumeric,
+    };
   }
 
   // Otherwise, it's a simple numeric district
-  return { county: "", number: parseInt(distStr), isCountyFormat: false };
+  return {
+    county: "",
+    number: parseInt(distStr),
+    letter: "",
+    isCountyFormat: false,
+    isAlphanumeric: false,
+  };
 };

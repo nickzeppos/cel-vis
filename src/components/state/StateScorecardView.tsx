@@ -51,17 +51,13 @@ export function StateScorecardView() {
       try {
         // Parse term from URL parameter (format: "2023-2024")
         const [startYear, endYear] = termParam.split("-").map(Number);
-        
+
         if (isNaN(startYear) || isNaN(endYear)) {
           throw new Error("Invalid term format");
         }
 
         // Fetch table data with the state we already know from the URL
-        const tableData = await getStateTableData(
-          state!,
-          startYear,
-          endYear
-        );
+        const tableData = await getStateTableData(state!, startYear, endYear);
 
         const legislatorData = tableData.data.find(
           (l) => l.slesId === parseInt(slesId!)
@@ -73,7 +69,7 @@ export function StateScorecardView() {
 
         // We already have the legislator data from the first API call
         const updatedLegislator = legislatorData;
-        
+
         // No need for a second check since we already found the legislator
 
         // Fetch scorecard data
@@ -100,34 +96,34 @@ export function StateScorecardView() {
 
   const handleTermChange = async (termString: string) => {
     if (!legislator || !scorecard || !slesId) return;
-    
+
     setIsLoading(true);
 
     const term = scorecard.validStateTerms.find(
       (term) => getTermDisplayName(term) === termString
     );
-    
+
     if (!term) {
       toast.error("Invalid term selected");
       setIsLoading(false);
       return;
     }
-    
+
     const { startYear, endYear } = term;
-    
+
     try {
       // Update URL to reflect the new term using query parameters
       const params = new URLSearchParams(searchParams);
-      params.set('term', `${startYear}-${endYear}`);
+      params.set("term", `${startYear}-${endYear}`);
       setSearchParams(params, { replace: true });
-      
+
       // Fetch new table data first to get updated LES and rank
       const tableData = await getStateTableData(
         state!, // Use the state from URL params instead of legislator.state
         startYear,
         endYear
       );
-      
+
       const updatedLegislator = tableData.data.find(
         (l) => l.slesId === legislator.slesId
       );
@@ -249,7 +245,9 @@ export function StateScorecardView() {
                   <div className="flex items-center justify-between px-4 py-3 bg-gray-100 rounded-md">
                     <span className="font-medium">Benchmark</span>
                     <span className="font-mono">
-                      {legislator.benchmark.toFixed(3)}
+                      {legislator.benchmark === null
+                        ? "—"
+                        : legislator.benchmark.toFixed(3)}
                     </span>
                   </div>
                   <div className="flex items-center justify-between px-4 py-3 bg-gray-100 rounded-md">

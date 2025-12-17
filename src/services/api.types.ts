@@ -119,7 +119,7 @@ export const stateVisTableValidator = z.object({
   party: statePartyInitialValidator,
   district: z.union([z.string(), z.number()]),
   sles: z.number(),
-  benchmark: z.number(),
+  benchmark: z.union([z.number(), z.null()]),
   partyRank: z.number(),
   partyTotal: z.number(),
   isMajority: z.boolean(),

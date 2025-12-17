@@ -13,8 +13,11 @@ export const expectationsColors = {
 
 export const getExpectation = (
   score: number,
-  benchmark: number
+  benchmark: number | null
 ): Expectation => {
+  if (benchmark === null) {
+    return Expectation.MEETS;
+  }
   const a = benchmark * 0.5;
   const b = benchmark * 1.5;
   if (score < a) return Expectation.BELOW;
