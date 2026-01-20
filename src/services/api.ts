@@ -174,6 +174,7 @@ export async function getStateTableData(
   );
 
   if (!safelyParsed.success) {
+    console.error(safelyParsed.error)
     throw new Error("Failed to parse state legislator data");
   }
 
