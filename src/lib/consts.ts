@@ -23,7 +23,7 @@ export const AVAILABLE_STATES = [
   "AL",
   "GA",
   "MT",
-  // "LA",
+  "LA",
   "PA",
   "IL",
   "CA",
