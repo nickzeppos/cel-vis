@@ -10,4 +10,5 @@ export const partyColors = {
   D: "bg-blue-100",
   I: "bg-gray-100",
   "3rd": "bg-gray-100",
+  N: "bg-gray-100",
 } as const;

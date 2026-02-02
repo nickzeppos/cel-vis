@@ -12,6 +12,7 @@ const partyNames: Record<string, string> = {
   D: "Democrat",
   R: "Republican",
   I: "Independent",
+  N: "Not Affiliated",
 };
 
 interface StateTableProps {

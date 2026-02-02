@@ -197,9 +197,9 @@ export function getStateTableRows({
     //     ? sortAscending(filtered, (l) => l.partyRank)
     //     : sortDescending(filtered, (l) => l.partyRank);
     sorted = [...filtered].sort((a, b) => {
-      // check if either row corresponds to independent or 3rd party
-      const aHasRank = a.party !== "I" && a.party !== "3rd";
-      const bHasRank = b.party !== "I" && b.party !== "3rd";
+      // check if either row corresponds to independent, 3rd party, or not affiliated
+      const aHasRank = a.party !== "I" && a.party !== "3rd" && a.party !== "N";
+      const bHasRank = b.party !== "I" && b.party !== "3rd" && b.party !== "N";
 
       // anchor non major parties to bottom
       if (aHasRank && !bHasRank) return -1;
