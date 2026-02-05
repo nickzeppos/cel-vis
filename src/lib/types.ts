@@ -47,6 +47,7 @@ export const statePartyInitialValidator = z.union([
   majorPartyInitialValidator,
   z.literal("3rd"),
   z.literal("I"),
+  z.literal("N"),
 ]);
 export const termValidator = z.object({
   startYear: z.number(),

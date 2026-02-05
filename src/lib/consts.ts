@@ -23,14 +23,15 @@ export const AVAILABLE_STATES = [
   "AL",
   "GA",
   "MT",
-  // "LA",
+//  "LA",
   "PA",
   "IL",
   "CA",
   "MD",
-  // "MS",
+  "MS",
   "NV",
   "NY",
+//  "WI",
 ] as const;
 
 export const partyOrder: PartyOrderConfig = [
@@ -66,4 +67,5 @@ export const partyNames: Record<string, string> = {
   D: "Democrat",
   R: "Republican",
   I: "Independent",
+  N: "Not Affiliated",
 };
