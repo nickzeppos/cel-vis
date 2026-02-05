@@ -20,11 +20,11 @@ export const chamberLabels: {
 
 // Avail state config
 export const AVAILABLE_STATES = [
-  "AK",
+//  "AK",
     "AL",
   "GA",
   "MT",
-  "LA",
+//  "LA",
   "PA",
   "IL",
   "CA",
@@ -32,7 +32,7 @@ export const AVAILABLE_STATES = [
   "MS",
   "NV",
   "NY",
-  "WI",
+//  "WI",
 ] as const;
 
 export const partyOrder: PartyOrderConfig = [
