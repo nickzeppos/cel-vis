@@ -39,6 +39,8 @@ export const AVAILABLE_STATES = [
   "NV",
   "NY",
   "WI",
+  "MI",
+  "IN",
 ] as const;
 
 export const partyOrder: PartyOrderConfig = [
