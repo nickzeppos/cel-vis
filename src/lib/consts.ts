@@ -20,6 +20,8 @@ export const chamberLabels: {
 
 // Avail state config
 export const AVAILABLE_STATES = [
+"VT",
+"RI",
   "ID",
   "TN",
   "ND",
