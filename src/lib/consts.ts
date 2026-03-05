@@ -19,21 +19,22 @@ export const chamberLabels: {
 } as const;
 
 // Avail state config
+// Keep alphabetical or sort in component usage
 export const AVAILABLE_STATES = [
-    "CT",
-    "FL",
-    "IA",
   "AL",
-  "GA",
-  "MT",
-  "LA",
-  "PA",
-  "IL",
   "CA",
+  "CT",
+  "FL",
+  "GA",
+  "IA",
+  "IL",
+  "LA",
   "MD",
   "MS",
+  "MT",
   "NV",
   "NY",
+  "PA",
   "WI",
 ] as const;
 
