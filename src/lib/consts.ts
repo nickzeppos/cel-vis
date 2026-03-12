@@ -23,9 +23,12 @@ export const chamberLabels: {
 export const AVAILABLE_STATES = [
   "AL",
   "CA",
+  "CO",
   "CT",
+  "DE",
   "FL",
   "GA",
+  "HI",
   "IA",
   "IL",
   "LA",
