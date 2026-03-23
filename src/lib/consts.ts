@@ -34,6 +34,8 @@ export const AVAILABLE_STATES = [
   "ID",
   "IL",
   "IN",
+  "KS",
+  "KY",
   "LA",
   "MD",
   "MI",
