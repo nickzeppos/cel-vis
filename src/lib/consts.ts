@@ -37,6 +37,7 @@ export const AVAILABLE_STATES = [
   "KS",
   "KY",
   "LA",
+  "MA",
   "MD",
   "MI",
   "MS",
