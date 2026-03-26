@@ -22,6 +22,7 @@ export const chamberLabels: {
 // Keep alphabetical or sort in component usage
 export const AVAILABLE_STATES = [
   "AL",
+  "AZ",
   "CA",
   "CO",
   "CT",
@@ -30,6 +31,7 @@ export const AVAILABLE_STATES = [
   "GA",
   "HI",
   "IA",
+  "ID",
   "IL",
   "IN",
   "LA",
@@ -40,6 +42,7 @@ export const AVAILABLE_STATES = [
   "NV",
   "NY",
   "PA",
+  "VT",
   "WI",
 ] as const;
 
