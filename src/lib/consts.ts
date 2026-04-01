@@ -40,6 +40,7 @@ export const AVAILABLE_STATES = [
   "LA",
   "MA",
   "MD",
+  "ME",
   "MI",
   "MS",
   "MN",
