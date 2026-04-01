@@ -22,6 +22,7 @@ export const chamberLabels: {
 export const AVAILABLE_STATES = [
   "AK",
   "AL",
+  "AR",
   "AZ",
   "CA",
   "CO",
@@ -41,6 +42,7 @@ export const AVAILABLE_STATES = [
   "MD",
   "MI",
   "MS",
+  "MN",
   "MT",
   "ND",
   "NV",
