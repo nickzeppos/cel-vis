@@ -39,9 +39,11 @@ export const AVAILABLE_STATES = [
   "MI",
   "MS",
   "MT",
+  "ND",
   "NV",
   "NY",
   "PA",
+  "RI",
   "VT",
   "WI",
 ] as const;
