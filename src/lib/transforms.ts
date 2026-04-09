@@ -255,6 +255,28 @@ export function getStateTableRows({
           : b.name.localeCompare(a.name);
       }
 
+      // Handle suffix format districts (e.g., "01-HAM", "02-HAM", "01-NOR")
+      // Sort: suffix alpha → number within suffix → name tiebreaker
+      if (distA.isSuffixFormat || distB.isSuffixFormat) {
+        const suffixComparison =
+          sortDirection === "asc"
+            ? distA.county.localeCompare(distB.county)
+            : distB.county.localeCompare(distA.county);
+
+        if (suffixComparison !== 0) return suffixComparison;
+
+        const numberComparison =
+          sortDirection === "asc"
+            ? distA.number - distB.number
+            : distB.number - distA.number;
+
+        if (numberComparison !== 0) return numberComparison;
+
+        return sortDirection === "asc"
+          ? a.name.localeCompare(b.name)
+          : b.name.localeCompare(a.name);
+      }
+
       // Handle county format districts (e.g., "Clark-1", "Capital")
       if (distA.isCountyFormat || distB.isCountyFormat) {
         const countyComparison =
@@ -321,6 +343,7 @@ export function flattenGroupedRows(rows: GroupedFederalRow[]): VisTable[] {
 // Districts are most often just numbers, but in some cases they require specific handling
 // E.g., In NV upper, districts are "Clark-1", "Clark-2", "Capital", etc.
 // E.g., In MD lower, districts can be alphanumeric like "1A", "1B", "2A", etc.
+// E.g., In MA, districts are "01-HAM", "02-HAM", "01-NOR" — sort by suffix alpha, then number within.
 
 // Currently this just parse based. But you can easily imagine a config based approach, e.g., (state) => { ...rules... }
 // Since this is the first instance of special handling, I'm sticking with parsing + ifs. But, if this grows, revisit.
@@ -330,12 +353,33 @@ const parseDistrict = (district: string | number) => {
   let isAlphanumeric = false;
 
   // One of three ways it's special format:
-  // (1) contains a hyphen (e.g., "Clark-1")
+  // (1) contains a hyphen — two sub-cases:
+  //   (a) "NUMBER-TEXT" (e.g., "01-HAM"): sort by suffix alpha, then number — MA style
+  //   (b) "TEXT-NUMBER" (e.g., "Clark-1"): sort by county name, then number — NV style
   if (distStr.includes("-")) {
+    const [left, right] = distStr.split("-");
+    const leftNum = parseInt(left);
+    if (!isNaN(leftNum)) {
+      // NUMBER-TEXT format (MA style)
+      return {
+        county: right.toUpperCase(),
+        number: leftNum,
+        letter: "",
+        isCountyFormat: true,
+        isAlphanumeric: false,
+        isSuffixFormat: true,
+      };
+    }
     isCountyFormat = true;
-    const [county, numberStr] = distStr.split("-");
-    const number = parseInt(numberStr);
-    return { county, number, letter: "", isCountyFormat, isAlphanumeric };
+    const number = parseInt(right);
+    return {
+      county: left,
+      number,
+      letter: "",
+      isCountyFormat,
+      isAlphanumeric,
+      isSuffixFormat: false,
+    };
   }
 
   // (2) is alphanumeric (e.g., "1A", "23B")
@@ -344,7 +388,14 @@ const parseDistrict = (district: string | number) => {
     isAlphanumeric = true;
     const number = parseInt(alphanumericMatch[1]);
     const letter = alphanumericMatch[2].toUpperCase();
-    return { county: "", number, letter, isCountyFormat, isAlphanumeric };
+    return {
+      county: "",
+      number,
+      letter,
+      isCountyFormat,
+      isAlphanumeric,
+      isSuffixFormat: false,
+    };
   }
 
   // (3) is purely non-numeric (e.g., "Capital")
@@ -356,6 +407,7 @@ const parseDistrict = (district: string | number) => {
       letter: "",
       isCountyFormat,
       isAlphanumeric,
+      isSuffixFormat: false,
     };
   }
 
@@ -366,5 +418,6 @@ const parseDistrict = (district: string | number) => {
     letter: "",
     isCountyFormat: false,
     isAlphanumeric: false,
+    isSuffixFormat: false,
   };
 };

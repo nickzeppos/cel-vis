@@ -41,6 +41,8 @@ export function StateControlPanel({
   const [searchInputValue, setSearchInputValue] = React.useState("");
   const { termList = [], isLoading } = useTermList(selectedState);
 
+  const UNICAMERAL_STATES = ["NE"];
+
   const handleStateSelect = (state: string) => {
     if (state === "") {
       onStateSelect("");
@@ -49,6 +51,9 @@ export function StateControlPanel({
       return;
     } else {
       onStateSelect(state);
+      if (UNICAMERAL_STATES.includes(state)) {
+        onChamberChange("upper");
+      }
     }
   };
 
@@ -64,6 +69,12 @@ export function StateControlPanel({
       onTermChange(getTermDisplayName(mostRecentTerm));
     }
   }, [selectedState, termList, isLoading]);
+
+  useEffect(() => {
+    if (UNICAMERAL_STATES.includes(selectedState) && selectedChamber === "lower") {
+      onChamberChange("upper");
+    }
+  }, [selectedState]);
 
   const handleSearchChange = (value: string) => {
     setSearchInputValue(value);
@@ -139,6 +150,7 @@ export function StateControlPanel({
 
                   {/* Chamber Selector */}
                   <StateChamberSelector
+                    selectedState={selectedState}
                     selectedChamber={selectedChamber}
                     onChamberChange={onChamberChange}
                   />

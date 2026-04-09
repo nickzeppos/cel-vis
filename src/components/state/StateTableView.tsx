@@ -101,6 +101,8 @@ function StateTableView() {
             if (stateState.selectedTerm) {
               url.searchParams.set('term', stateState.selectedTerm);
             }
+
+            url.searchParams.set('chamber', legislator.chamber);
             
             navigate(url.pathname + url.search);
           }}
