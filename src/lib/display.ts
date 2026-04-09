@@ -74,6 +74,10 @@ export const getValidTermDisplayName = (term: ValidTerm): string => {
   return `${term.startYear}-${term.endYear} ${chamberName}`;
 };
 
+export const getValidTermValue = (term: ValidTerm): string => {
+  return `${term.startYear}-${term.endYear}:${term.chamber}`;
+};
+
 export const getTermDisplayName = (term: {
   startYear: number;
   endYear: number;

@@ -9,11 +9,13 @@ import {
 import {
   getStateLocationText,
   getValidTermDisplayName,
+  getValidTermValue,
   getTermDisplayName,
 } from "@/lib/display";
 import { getExpectation, getExpectationColor } from "@/lib/expectations";
 import { getStateScorecardData, getStateTableData } from "@/services/api";
 import type {
+  ValidTerm,
   StateVisScorecardResponse,
   StateVisTable,
 } from "@/services/api.types";
@@ -24,7 +26,7 @@ import { ExpectationIcon } from "@/components/shared/ExpectationIcon";
 import { PartyLabel } from "@/components/shared/PartyLabel";
 import { ScoreMatrix } from "@/components/shared/ScoreMatrix";
 import { StateScorecardGlossary } from "@/components/state/StateScorecardGlossary";
-import { Term } from "@/lib/types";
+import { StateChamber } from "@/lib/types";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 
 export function StateScorecardView() {
@@ -32,12 +34,18 @@ export function StateScorecardView() {
   const { state, slesId } = useParams();
   const [searchParams, setSearchParams] = useSearchParams();
   const termParam = searchParams.get("term");
-  const [selectedTerm, setSelectedTerm] = useState<Term | null>(null);
+  const chamberParam = searchParams.get("chamber");
+  const [selectedTerm, setSelectedTerm] = useState<ValidTerm | null>(null);
   const [legislator, setLegislator] = useState<StateVisTable | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [scorecard, setScorecard] = useState<StateVisScorecardResponse | null>(
     null
   );
+
+  const requestedChamber =
+    chamberParam === "upper" || chamberParam === "lower"
+      ? (chamberParam as StateChamber)
+      : null;
 
   // Load initial data when component mounts
   useEffect(() => {
@@ -59,9 +67,13 @@ export function StateScorecardView() {
         // Fetch table data with the state we already know from the URL
         const tableData = await getStateTableData(state!, startYear, endYear);
 
-        const legislatorData = tableData.data.find(
+        const legislatorMatches = tableData.data.filter(
           (l) => l.slesId === parseInt(slesId!)
         );
+        const legislatorData =
+          legislatorMatches.find(
+            (l) => !requestedChamber || l.chamber === requestedChamber
+          ) ?? legislatorMatches[0];
 
         if (!legislatorData) {
           throw new Error("Legislator not found");
@@ -79,7 +91,24 @@ export function StateScorecardView() {
           endYear
         );
 
-        setSelectedTerm({ startYear, endYear });
+        const matchingTerm =
+          newScorecard.validStateTerms.find(
+            (term) =>
+              term.startYear === startYear &&
+              term.endYear === endYear &&
+              term.chamber === legislatorData.chamber
+          ) ?? {
+            startYear,
+            endYear,
+            chamber: legislatorData.chamber,
+          };
+
+        const params = new URLSearchParams(searchParams);
+        params.set("term", `${startYear}-${endYear}`);
+        params.set("chamber", legislatorData.chamber);
+        setSearchParams(params, { replace: true });
+
+        setSelectedTerm(matchingTerm);
         setLegislator(updatedLegislator);
         setScorecard(newScorecard);
       } catch (err) {
@@ -92,15 +121,15 @@ export function StateScorecardView() {
     };
 
     fetchInitialData();
-  }, [slesId, termParam, navigate]);
+  }, [state, slesId, termParam, requestedChamber, navigate, searchParams, setSearchParams]);
 
-  const handleTermChange = async (termString: string) => {
+  const handleTermChange = async (termValue: string) => {
     if (!legislator || !scorecard || !slesId) return;
 
     setIsLoading(true);
 
     const term = scorecard.validStateTerms.find(
-      (term) => getTermDisplayName(term) === termString
+      (term) => getValidTermValue(term) === termValue
     );
 
     if (!term) {
@@ -115,6 +144,7 @@ export function StateScorecardView() {
       // Update URL to reflect the new term using query parameters
       const params = new URLSearchParams(searchParams);
       params.set("term", `${startYear}-${endYear}`);
+      params.set("chamber", term.chamber);
       setSearchParams(params, { replace: true });
 
       // Fetch new table data first to get updated LES and rank
@@ -125,7 +155,7 @@ export function StateScorecardView() {
       );
 
       const updatedLegislator = tableData.data.find(
-        (l) => l.slesId === legislator.slesId
+        (l) => l.slesId === legislator.slesId && l.chamber === term.chamber
       );
 
       if (!updatedLegislator) {
@@ -188,7 +218,7 @@ export function StateScorecardView() {
                       TERM
                     </label>
                     <Select
-                      value={getTermDisplayName(selectedTerm)}
+                      value={getValidTermValue(selectedTerm)}
                       onValueChange={handleTermChange}
                       disabled={isLoading}
                     >
@@ -200,7 +230,8 @@ export function StateScorecardView() {
                                 scorecard?.validStateTerms?.find(
                                   (term) =>
                                     term.startYear === selectedTerm.startYear &&
-                                    term.endYear === selectedTerm.endYear
+                                    term.endYear === selectedTerm.endYear &&
+                                    term.chamber === selectedTerm.chamber
                                 );
 
                               // Use the matching term if found, otherwise just show the display name
@@ -213,8 +244,8 @@ export function StateScorecardView() {
                       <SelectContent>
                         {scorecard.validStateTerms.map((term) => (
                           <SelectItem
-                            key={getTermDisplayName(term)}
-                            value={getTermDisplayName(term)}
+                            key={getValidTermValue(term)}
+                            value={getValidTermValue(term)}
                           >
                             {getValidTermDisplayName(term)}
                           </SelectItem>

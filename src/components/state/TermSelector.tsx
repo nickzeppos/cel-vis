@@ -5,7 +5,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { getValidTermDisplayName, getTermDisplayName } from "@/lib/display";
+import {
+  getValidTermDisplayName,
+  getValidTermValue,
+} from "@/lib/display";
 import { ValidTerm } from "@/services/api.types";
 
 interface TermSelectorProps {
@@ -34,7 +37,7 @@ export function TermSelector({
             {selectedTermString &&
               getValidTermDisplayName(
                 validTerms.find(
-                  (term) => getTermDisplayName(term) === selectedTermString
+                  (term) => getValidTermValue(term) === selectedTermString
                 )!
               )}
           </SelectValue>
@@ -42,8 +45,8 @@ export function TermSelector({
         <SelectContent>
           {validTerms.map((term) => (
             <SelectItem
-              key={getTermDisplayName(term)}
-              value={getTermDisplayName(term)}
+              key={getValidTermValue(term)}
+              value={getValidTermValue(term)}
             >
               {getValidTermDisplayName(term)}
             </SelectItem>
