@@ -48,6 +48,8 @@ export const AVAILABLE_STATES = [
   "MT",
   "NC",
   "ND",
+  "NE",
+  "NM",
   "NV",
   "NY",
   "OK",
