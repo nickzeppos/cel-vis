@@ -58,6 +58,7 @@ export const AVAILABLE_STATES = [
   "OR",
   "PA",
   "RI",
+  "SC",
   "SD",
   "TN",
   "VT",
