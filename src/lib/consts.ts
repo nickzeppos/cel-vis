@@ -61,6 +61,7 @@ export const AVAILABLE_STATES = [
   "SC",
   "SD",
   "TN",
+  "UT",
   "VT",
   "WA",
   "WI",
