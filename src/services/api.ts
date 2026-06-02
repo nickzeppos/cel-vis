@@ -1,7 +1,7 @@
 /**
  * API service for The Lawmakers API
  */
-import { congressionalDistrictValidator } from "@/lib/types";
+import { congressionalDistrictValidator, type StateChamber } from "@/lib/types";
 import {
   type CongressionalDistrict,
   CongressList,
@@ -184,13 +184,15 @@ export async function getStateTableData(
 export async function getStateScorecardData(
   slesId: number,
   startYear: number,
-  endYear: number
+  endYear: number,
+  chamber: StateChamber
 ): Promise<StateVisScorecardResponse> {
   const baseUrl = `${API_BASE_URL}/vis/stateScorecard`;
   const queryParams = new URLSearchParams({
     slesId: slesId.toString(),
     termStartYear: startYear.toString(),
     termEndYear: endYear.toString(),
+    chamber,
   });
   const url = `${baseUrl}?${queryParams}`;
 
