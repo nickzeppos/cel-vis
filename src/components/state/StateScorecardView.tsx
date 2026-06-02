@@ -88,7 +88,8 @@ export function StateScorecardView() {
         const newScorecard = await getStateScorecardData(
           parseInt(slesId),
           startYear,
-          endYear
+          endYear,
+          legislatorData.chamber
         );
 
         const matchingTerm =
@@ -167,7 +168,8 @@ export function StateScorecardView() {
       const newScorecard = await getStateScorecardData(
         parseInt(slesId),
         startYear,
-        endYear
+        endYear,
+        term.chamber
       );
 
       // Only update state if both fetches succeed
