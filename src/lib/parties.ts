@@ -13,9 +13,28 @@ export function getFederalPartyOrder(
 
 export function getStatePartyOrder(
   table: StateVisTable[],
-  chamber: "upper" | "lower"
+  chamber: "upper" | "lower",
+  state?: string
 ): Array<StatePartyInitial> {
-  // acquire the isMajority value for one D chamber upper row and one D chamber upper row
+  if (state === "AK") {
+    const majorityCounts = table.reduce(
+      (counts, row) => {
+        if (row.chamber === chamber && row.isMajority) {
+          if (row.party === "D") counts.D += 1;
+          if (row.party === "R") counts.R += 1;
+        }
+
+        return counts;
+      },
+      { D: 0, R: 0 }
+    );
+
+    return majorityCounts.D > majorityCounts.R
+      ? ["D", "R", "I", "3rd", "N"]
+      : ["R", "D", "I", "3rd", "N"];
+  }
+
+  // For non-Alaska states, a single Democratic row identifies the chamber majority.
   const isMajorityD = table.find(
     (row) => row.party === "D" && row.chamber === chamber
   )?.isMajority;

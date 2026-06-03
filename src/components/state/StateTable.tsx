@@ -77,6 +77,7 @@ export function StateTable({
   const { tableRows, summary } = useMemo(() => {
     const tableRows = getStateTableRows({
       legislators: legislatorsData,
+      state: selectedState,
       chamber,
       searchTerm,
       sortField,
@@ -98,13 +99,20 @@ export function StateTable({
       return acc;
     }, {} as Record<string, number>);
 
-    const partyOrder = getStatePartyOrder(flatRows, chamber);
+    const partyOrder = getStatePartyOrder(flatRows, chamber, selectedState);
 
     return {
       tableRows,
       summary: { numLegislators, partyCounts, orderedParties: partyOrder },
     };
-  }, [legislatorsData, chamber, searchTerm, sortField, sortDirection]);
+  }, [
+    legislatorsData,
+    selectedState,
+    chamber,
+    searchTerm,
+    sortField,
+    sortDirection,
+  ]);
 
   return (
     <BaseTable<GroupedStateRow>

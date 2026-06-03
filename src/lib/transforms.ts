@@ -158,12 +158,14 @@ export function getFederalTableRows({
 
 export function getStateTableRows({
   legislators,
+  state,
   chamber,
   searchTerm,
   sortField,
   sortDirection,
 }: {
   legislators: StateVisTable[];
+  state?: string;
   chamber: "upper" | "lower";
   searchTerm: string;
   sortField: SortField;
@@ -311,7 +313,7 @@ export function getStateTableRows({
       grouped[p].push(leg);
     }
 
-    const order = getStatePartyOrder(legislators, chamber);
+    const order = getStatePartyOrder(legislators, chamber, state);
     const output: GroupedStateRow[] = [];
 
     for (const party of order) {
