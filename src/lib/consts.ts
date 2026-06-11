@@ -57,7 +57,7 @@ export const AVAILABLE_STATES = [
   "NY",
   "OH",
   "OK",
-  // "OR",
+  "OR",
   "PA",
   "RI",
   "SC",
@@ -67,7 +67,7 @@ export const AVAILABLE_STATES = [
   "UT",
   // "VA",
   "VT",
-  // "WA",
+  "WA",
   "WI",
   "WV",
 ] as const;
