@@ -21,7 +21,7 @@ export const chamberLabels: {
 // Avail state config
 // Keep alphabetical or sort in component usage
 export const AVAILABLE_STATES = [
-  // "AK",
+  "AK",
   "AL",
   "AR",
   "AZ",
@@ -70,6 +70,7 @@ export const AVAILABLE_STATES = [
   "WA",
   "WI",
   "WV",
+  "WY",
 ] as const;
 
 export const partyOrder: PartyOrderConfig = [
